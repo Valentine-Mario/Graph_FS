@@ -1,5 +1,8 @@
-mod schema;
+pub mod schema;
+mod remote_fs;
+mod local_fs;
 mod fs_utils;
+
 
 use std::{io, sync::Arc};
 
@@ -10,7 +13,7 @@ use actix_web::{
     App, HttpResponse, HttpServer, Responder,
 };
 use actix_web_lab::respond::Html;
-use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
+use juniper::{http::{graphiql::graphiql_source, GraphQLRequest}, futures::lock::Mutex};
 
 use crate::schema::{create_schema, Schema};
 
@@ -23,14 +26,15 @@ async fn graphql_playground() -> impl Responder {
 /// GraphQL endpoint
 #[route("/graphql", method = "GET", method = "POST")]
 async fn graphql(st: web::Data<Schema>, data: web::Json<GraphQLRequest>) -> impl Responder {
-    let user = data.execute(&st, &()).await;
+    //initialize context here
+    let ctx=schema::Context{counter: 1};
+    let user = data.execute(&st, &ctx).await;
     HttpResponse::Ok().json(user)
 }
 #[actix_web::main]
 async fn main() -> io::Result<()> {
     dotenv::dotenv().ok();
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
-    println!("{:?}", fs_utils::get_dir());
 
     // Create Juniper schema
     let schema = Arc::new(create_schema());
