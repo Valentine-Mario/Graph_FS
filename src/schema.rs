@@ -65,13 +65,13 @@ impl MutationRoot {
 
 pub struct  Subscription;
 
-type StringStream = Pin<Box<dyn Stream<Item = Result<String, FieldError>> + Send>>;
+type StringStream = Pin<Box<dyn Stream<Item = String> + Send>>;
 
 #[graphql_subscription(context = Context)]
 impl Subscription {
     async fn hello_world() -> StringStream {
         let stream =
-            futures::stream::iter(vec![Ok(String::from("Hello")), Ok(String::from("World!"))]);
+            futures::stream::iter(vec![String::from("hello world")]);
         Box::pin(stream)
     }
 }
