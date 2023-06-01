@@ -1,8 +1,8 @@
-pub mod schema;
-mod remote_fs;
-mod local_fs;
+mod cli;
 mod fs_utils;
-
+mod local_fs;
+mod remote_fs;
+pub mod schema;
 
 use std::{io, sync::Arc};
 
@@ -13,7 +13,8 @@ use actix_web::{
     App, HttpResponse, HttpServer, Responder,
 };
 use actix_web_lab::respond::Html;
-use juniper::{http::{graphiql::graphiql_source, GraphQLRequest}, futures::lock::Mutex};
+use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
+use ssh2::Session;
 
 use crate::schema::{create_schema, Schema};
 
@@ -27,20 +28,38 @@ async fn graphql_playground() -> impl Responder {
 #[route("/graphql", method = "GET", method = "POST")]
 async fn graphql(st: web::Data<Schema>, data: web::Json<GraphQLRequest>) -> impl Responder {
     //initialize context here
-    let ctx=schema::Context{counter: 1};
-    let user = data.execute(&st, &ctx).await;
-    HttpResponse::Ok().json(user)
+    let args = cli::Args::new();
+    let sess = Session::new();
+
+    match sess {
+        Ok(mut sess) => {
+            if args.remote.is_some() && args.remote.unwrap() {
+                //create authenticated session
+                sess = remote_fs::connection(&args, sess).unwrap();
+            }
+            println!("session {}", sess.authenticated());
+            let ctx = schema::Context { sess };
+            let user = data.execute(&st, &ctx).await;
+            HttpResponse::Ok().json(user)
+        }
+        Err(_) => HttpResponse::ExpectationFailed().body("Error setting session"),
+    }
 }
 #[actix_web::main]
 async fn main() -> io::Result<()> {
     dotenv::dotenv().ok();
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+    let args = cli::Args::new();
 
     // Create Juniper schema
     let schema = Arc::new(create_schema());
-   
-    log::info!("starting HTTP server on port 8080");
-    log::info!("GraphiQL playground: http://localhost:8080/graphiql");
+
+    log::info!("starting HTTP server on port {}", args.port);
+    log::info!(
+        "GraphiQL playground: http://{}:{}/graphiql",
+        args.host,
+        args.port
+    );
 
     // Start HTTP server
     HttpServer::new(move || {
@@ -51,10 +70,13 @@ async fn main() -> io::Result<()> {
             // the graphiql UI requires CORS to be enabled
             .wrap(Cors::permissive())
             .wrap(middleware::Logger::default())
-            // .wrap(ctx.clone())
+        // .wrap(ctx.clone())
     })
     .workers(2)
-    .bind(("127.0.0.1", 8080))?
+    .bind((args.host, args.port))?
     .run()
     .await
 }
+//./target/debug/graph_fs -p 8000 -h 127.0.0.1
+//remote
+//./target/debug/graph_fs -p 8000 -h 127.0.0.1 --remote true --auth_option user_password --remote_host 127.0.0.1 --remote_port 22 --username <name> --password <pass>

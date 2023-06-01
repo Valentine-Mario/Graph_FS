@@ -1,9 +1,12 @@
 use std::pin::Pin;
 
 use juniper::futures::Stream;
-use juniper::{EmptySubscription, FieldResult, RootNode, graphql_subscription, futures, FieldError};
-use juniper::{GraphQLEnum, GraphQLInputObject, GraphQLObject};
 use juniper::Context as JuniperContext;
+use juniper::{
+    futures, graphql_subscription, EmptySubscription, FieldError, FieldResult, RootNode,
+};
+use juniper::{GraphQLEnum, GraphQLInputObject, GraphQLObject};
+use ssh2::Session;
 
 #[derive(GraphQLEnum)]
 enum Episode {
@@ -13,7 +16,7 @@ enum Episode {
 }
 
 pub struct Context {
-    pub counter: i32,
+    pub sess: Session,
 }
 
 impl JuniperContext for Context {}
@@ -41,7 +44,7 @@ pub struct QueryRoot;
 impl QueryRoot {
     async fn human(context: &Context, _id: String) -> FieldResult<Human> {
         Ok(Human {
-            id: context.counter,
+            id: 3553,
             name: "Luke".to_owned(),
             appears_in: vec![Episode::NewHope],
             home_planet: "Mars".to_owned(),
@@ -55,7 +58,7 @@ pub struct MutationRoot;
 impl MutationRoot {
     fn create_human(context: &Context, new_human: NewHuman) -> FieldResult<Human> {
         Ok(Human {
-            id: context.counter,
+            id: 235,
             name: new_human.name,
             appears_in: new_human.appears_in,
             home_planet: new_human.home_planet,
@@ -63,19 +66,17 @@ impl MutationRoot {
     }
 }
 
-pub struct  Subscription;
+pub struct Subscription;
 
 type StringStream = Pin<Box<dyn Stream<Item = String> + Send>>;
 
 #[graphql_subscription(context = Context)]
 impl Subscription {
     async fn hello_world() -> StringStream {
-        let stream =
-            futures::stream::iter(vec![String::from("hello world")]);
+        let stream = futures::stream::iter(vec![String::from("hello world")]);
         Box::pin(stream)
     }
 }
-
 
 pub type Schema = RootNode<'static, QueryRoot, MutationRoot, Subscription>;
 
