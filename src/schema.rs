@@ -2,14 +2,12 @@ use std::pin::Pin;
 
 use juniper::futures::Stream;
 use juniper::Context as JuniperContext;
-use juniper::{
-    futures, graphql_subscription, EmptySubscription, FieldError, FieldResult, RootNode,
-};
+use juniper::{futures, graphql_subscription, FieldResult, RootNode};
 use juniper::{GraphQLEnum, GraphQLInputObject, GraphQLObject};
 use ssh2::Session;
 
 #[derive(GraphQLEnum)]
-enum Episode {
+pub enum Episode {
     NewHope,
     Empire,
     Jedi,
@@ -23,11 +21,11 @@ impl JuniperContext for Context {}
 
 #[derive(GraphQLObject)]
 #[graphql(description = "A humanoid creature in the Star Wars universe")]
-struct Human {
-    id: i32,
-    name: String,
-    appears_in: Vec<Episode>,
-    home_planet: String,
+pub struct Human {
+    pub id: i32,
+    pub name: String,
+    pub appears_in: Vec<Episode>,
+    pub home_planet: String,
 }
 
 #[derive(GraphQLInputObject)]
@@ -39,18 +37,6 @@ struct NewHuman {
 }
 
 pub struct QueryRoot;
-
-#[juniper::graphql_object(context = Context)]
-impl QueryRoot {
-    async fn human(context: &Context, _id: String) -> FieldResult<Human> {
-        Ok(Human {
-            id: 3553,
-            name: "Luke".to_owned(),
-            appears_in: vec![Episode::NewHope],
-            home_planet: "Mars".to_owned(),
-        })
-    }
-}
 
 pub struct MutationRoot;
 

@@ -35,9 +35,9 @@ async fn graphql(st: web::Data<Schema>, data: web::Json<GraphQLRequest>) -> impl
         Ok(mut sess) => {
             if args.remote.is_some() && args.remote.unwrap() {
                 //create authenticated session
-                sess = remote_fs::connection(&args, sess).unwrap();
+                sess = remote_fs::utils::connection(&args, sess).unwrap();
             }
-            println!("session {}", sess.authenticated());
+            log::info!("SSH session authenticated {}", sess.authenticated());
             let ctx = schema::Context { sess };
             let user = data.execute(&st, &ctx).await;
             HttpResponse::Ok().json(user)

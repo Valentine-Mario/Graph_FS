@@ -26,7 +26,7 @@ pub struct Args {
     pub username: Option<String>,
 
     //password
-    #[structopt(long = "password", about = "the auth password")]
+    #[structopt(long = "password", about = "The auth password")]
     pub password: Option<String>,
 
     //publick key
