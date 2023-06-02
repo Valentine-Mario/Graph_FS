@@ -1,15 +1,17 @@
+use std::{io::Error, path::Path};
+
 use juniper::FieldResult;
 
-use crate::schema::{Context, Episode, Human, QueryRoot};
+use super::utils::{get_file_list, get_folder_list};
+use crate::schema::{Context, File, Folder, QueryRoot};
 
 #[juniper::graphql_object(context = Context)]
 impl QueryRoot {
-    async fn human(_id: String) -> FieldResult<Human> {
-        Ok(Human {
-            id: 3553,
-            name: "Luke".to_owned(),
-            appears_in: vec![Episode::NewHope],
-            home_planet: "Mars".to_owned(),
-        })
+    fn read_file_in_dir(path: String) -> FieldResult<Vec<File>> {
+        Ok(get_file_list(Path::new(&path))?)
+    }
+
+    fn read_dir_in_dir(path: String) -> FieldResult<Vec<Folder>> {
+        Ok(get_folder_list(Path::new(&path))?)
     }
 }

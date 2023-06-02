@@ -49,7 +49,7 @@ pub fn get_folder_list(path: &Path) -> Result<Vec<Folder>, Error> {
 }
 
 fn get_file_size(path: &Path) -> Result<f64, Error> {
-    Ok((path.metadata()?.len() / 1024) as f64)
+    Ok((path.metadata()?.len()) as f64)
 }
 
 fn get_file_type(name: &str) -> Result<String, Error> {
