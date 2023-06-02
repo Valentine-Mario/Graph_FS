@@ -654,6 +654,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "file-format"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "71a5df8a0f4b423e8bc25526b39852bf64dfb7bd734ed99ed343c5925762c9c8"
+
+[[package]]
 name = "flate2"
 version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -677,6 +683,12 @@ checksum = "a9c384f161156f5260c24a097c56119f9be8c798586aecc13afbcbe7b7e26bf8"
 dependencies = [
  "percent-encoding",
 ]
+
+[[package]]
+name = "fs_extra"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "42703706b716c37f96a77aea830392ad231f44c9e9a67872fa5548707e11b11c"
 
 [[package]]
 name = "futures"
@@ -792,6 +804,8 @@ dependencies = [
  "actix-web-lab",
  "dotenv",
  "env_logger",
+ "file-format",
+ "fs_extra",
  "juniper",
  "log",
  "serde",

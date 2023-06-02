@@ -19,6 +19,23 @@ pub struct Context {
 
 impl JuniperContext for Context {}
 
+#[derive(GraphQLObject, Debug)]
+#[graphql(description = "A simple representation of a file struct")]
+pub struct File {
+    pub name: String,
+    pub size: f64,
+    pub file_type: String,
+    pub parent_folder: String,
+}
+
+#[derive(GraphQLObject, Debug)]
+#[graphql(description = "A simple folder representation")]
+pub struct Folder {
+    pub name: String,
+    pub content_length: i32,
+    pub parent_folder: String,
+}
+
 #[derive(GraphQLObject)]
 #[graphql(description = "A humanoid creature in the Star Wars universe")]
 pub struct Human {
@@ -39,6 +56,28 @@ struct NewHuman {
 pub struct QueryRoot;
 
 pub struct MutationRoot;
+pub struct Subscription;
+
+impl File {
+    pub fn new(name: String, size: f64, file_type: String, parent_folder: String) -> Self {
+        File {
+            name,
+            size,
+            file_type,
+            parent_folder,
+        }
+    }
+}
+
+impl Folder {
+    pub fn new(name: String, content_length: i32, parent_folder: String) -> Self {
+        Folder {
+            name,
+            content_length,
+            parent_folder,
+        }
+    }
+}
 
 #[juniper::graphql_object(context = Context)]
 impl MutationRoot {
@@ -51,8 +90,6 @@ impl MutationRoot {
         })
     }
 }
-
-pub struct Subscription;
 
 type StringStream = Pin<Box<dyn Stream<Item = String> + Send>>;
 
