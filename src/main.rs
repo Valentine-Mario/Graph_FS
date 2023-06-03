@@ -7,7 +7,7 @@ pub mod schema;
 pub mod utils;
 
 use std::{
-    io::{self, Error},
+    io::{self},
     sync::Arc,
 };
 
@@ -15,7 +15,7 @@ use actix_cors::Cors;
 use actix_web::{
     get, middleware, route,
     web::{self, Data},
-    App, HttpRequest, HttpResponse, HttpServer, Responder,
+    App, HttpResponse, HttpServer, Responder,
 };
 use actix_web_lab::respond::Html;
 use juniper::http::{graphiql::graphiql_source, GraphQLRequest};

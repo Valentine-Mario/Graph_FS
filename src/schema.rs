@@ -42,6 +42,12 @@ pub struct ReadFileQuery {
     pub path: String,
 }
 
+#[derive(GraphQLObject, Debug)]
+#[graphql(description = "Message on completion of action")]
+pub struct Message {
+    pub msg: String,
+}
+
 #[derive(GraphQLObject)]
 #[graphql(description = "A humanoid creature in the Star Wars universe")]
 pub struct Human {
@@ -64,9 +70,15 @@ pub struct QueryRoot;
 pub struct MutationRoot;
 pub struct Subscription;
 
+impl Message {
+    pub fn new(msg: String) -> Self {
+        Self { msg }
+    }
+}
+
 impl File {
     pub fn new(name: String, size: f64, file_type: String, parent_folder: String) -> Self {
-        File {
+        Self {
             name,
             size,
             file_type,
@@ -77,7 +89,7 @@ impl File {
 
 impl Folder {
     pub fn new(name: String, content_length: i32, parent_folder: String) -> Self {
-        Folder {
+        Self {
             name,
             content_length,
             parent_folder,
