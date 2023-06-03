@@ -1,16 +1,21 @@
+mod api;
 mod cli;
 mod fs_utils;
 mod local_fs;
 mod remote_fs;
 pub mod schema;
+pub mod utils;
 
-use std::{io, sync::Arc};
+use std::{
+    io::{self, Error},
+    sync::Arc,
+};
 
 use actix_cors::Cors;
 use actix_web::{
     get, middleware, route,
     web::{self, Data},
-    App, HttpResponse, HttpServer, Responder,
+    App, HttpRequest, HttpResponse, HttpServer, Responder,
 };
 use actix_web_lab::respond::Html;
 use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
@@ -67,6 +72,7 @@ async fn main() -> io::Result<()> {
             .app_data(Data::from(schema.clone()))
             .service(graphql)
             .service(graphql_playground)
+            .service(api::read_file)
             // the graphiql UI requires CORS to be enabled
             .wrap(Cors::permissive())
             .wrap(middleware::Logger::default())
@@ -77,6 +83,6 @@ async fn main() -> io::Result<()> {
     .run()
     .await
 }
-//./target/debug/graph_fs -p 8000 -h 127.0.0.1
+//./target/debug/graph_fs -p 8000 -h 127.0.0.1 --auth_path /home/dead/Documents
 //remote
 //./target/debug/graph_fs -p 8000 -h 127.0.0.1 --remote true --auth_option user_password --remote_host 127.0.0.1 --remote_port 22 --username <name> --password <pass>

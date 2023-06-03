@@ -8,14 +8,11 @@ use crate::schema::{File, Folder};
 use fs_extra::dir::{get_dir_content2, DirOptions};
 
 pub fn get_file_list(path: &Path) -> Result<Vec<File>, Error> {
-    let file_list: Vec<std::path::PathBuf> = fs::read_dir(path)?
+    let file_list = fs::read_dir(path)?
         .into_iter()
         .filter(|r| r.is_ok()) // Get rid of Err variants for Result<DirEntry>
         .map(|r| r.unwrap().path()) // This is safe, since we only have the Ok variants
         .filter(|r| r.is_file()) // Filter out non-files
-        .collect();
-    let parsed_file = file_list
-        .iter()
         .map(|x| {
             let size = get_file_size(&x)?;
             let name = x.to_str().unwrap().to_string();
@@ -25,18 +22,15 @@ pub fn get_file_list(path: &Path) -> Result<Vec<File>, Error> {
             Ok(File::new(name, size, file_type, parent_folder))
         })
         .collect::<Result<Vec<File>, Error>>();
-    parsed_file
+    file_list
 }
 
 pub fn get_folder_list(path: &Path) -> Result<Vec<Folder>, Error> {
-    let folder_list: Vec<std::path::PathBuf> = fs::read_dir(path)?
+    let folder_list = fs::read_dir(path)?
         .into_iter()
         .filter(|r| r.is_ok()) // Get rid of Err variants for Result<DirEntry>
         .map(|r| r.unwrap().path()) // This is safe, since we only have the Ok variants
         .filter(|r| r.is_dir()) // Filter out non-files
-        .collect();
-    let parsed_folder = folder_list
-        .iter()
         .map(|x| {
             let name = x.to_str().unwrap().to_string();
             let content_length = get_dir_content_length(&x)?;
@@ -45,7 +39,8 @@ pub fn get_folder_list(path: &Path) -> Result<Vec<Folder>, Error> {
             Ok(Folder::new(name, content_length, parent_folder))
         })
         .collect::<Result<Vec<Folder>, Error>>();
-    parsed_folder
+
+    folder_list
 }
 
 fn get_file_size(path: &Path) -> Result<f64, Error> {

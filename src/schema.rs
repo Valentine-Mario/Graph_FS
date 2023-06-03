@@ -4,6 +4,7 @@ use juniper::futures::Stream;
 use juniper::Context as JuniperContext;
 use juniper::{futures, graphql_subscription, FieldResult, RootNode};
 use juniper::{GraphQLEnum, GraphQLInputObject, GraphQLObject};
+use serde::Deserialize;
 use ssh2::Session;
 
 #[derive(GraphQLEnum)]
@@ -34,6 +35,11 @@ pub struct Folder {
     pub name: String,
     pub content_length: i32,
     pub parent_folder: String,
+}
+
+#[derive(Deserialize)]
+pub struct ReadFileQuery {
+    pub path: String,
 }
 
 #[derive(GraphQLObject)]

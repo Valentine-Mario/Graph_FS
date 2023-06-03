@@ -1,4 +1,4 @@
-use std::{path::Path, str::FromStr};
+use std::str::FromStr;
 
 use structopt::StructOpt;
 
@@ -12,6 +12,10 @@ pub struct Args {
     //select port
     #[structopt(short = "p", long = "port")]
     pub port: u16,
+
+    //authorized path
+    #[structopt(long = "auth_path")]
+    pub authorized_path: String,
 
     //simple deploy payload
     #[structopt(long = "remote")]
