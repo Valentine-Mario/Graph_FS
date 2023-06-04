@@ -27,9 +27,9 @@ impl QueryRoot {
     }
 
     #[graphql(
-        description = "This query can be used to move or rename files. It is also used to rename folders. Do not use to move folders"
+        description = "This query can be used to rename files or folders"
     )]
-    fn move_or_rename_file(from: String, to: String) -> FieldResult<Message> {
+    fn rename_file_or_folder(from: String, to: String) -> FieldResult<Message> {
         let from_path = Path::new(&from);
         check_auth_path(&from_path)?;
 
@@ -40,7 +40,7 @@ impl QueryRoot {
     }
 
     #[graphql(
-        description = "This query is specifically for moving a folder or group of folders. It can also be used to move group of files"
+        description = "This query is used for moving a group of files or folders"
     )]
     fn move_folders(from: Vec<String>, to: String) -> FieldResult<Message> {
         let to_path = Path::new(&to);
