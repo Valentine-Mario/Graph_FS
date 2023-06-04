@@ -26,9 +26,7 @@ impl QueryRoot {
         Ok(get_folder_list(&path)?)
     }
 
-    #[graphql(
-        description = "This query can be used to rename files or folders"
-    )]
+    #[graphql(description = "This query can be used to rename files or folders")]
     fn rename_file_or_folder(from: String, to: String) -> FieldResult<Message> {
         let from_path = Path::new(&from);
         check_auth_path(&from_path)?;
@@ -39,9 +37,7 @@ impl QueryRoot {
         Ok(Message::new(String::from("Action completed successfully")))
     }
 
-    #[graphql(
-        description = "This query is used for moving a group of files or folders"
-    )]
+    #[graphql(description = "This query is used for moving a group of files or folders")]
     fn move_folders(from: Vec<String>, to: String) -> FieldResult<Message> {
         let to_path = Path::new(&to);
         check_auth_path(&to_path)?;

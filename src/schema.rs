@@ -1,9 +1,9 @@
 use std::pin::Pin;
 
 use juniper::futures::Stream;
-use juniper::Context as JuniperContext;
 use juniper::{futures, graphql_subscription, FieldResult, RootNode};
-use juniper::{GraphQLEnum, GraphQLInputObject, GraphQLObject};
+use juniper::{graphql_scalar, Context as JuniperContext, GraphQLValueAsync};
+use juniper::{GraphQLEnum, GraphQLInputObject, GraphQLObject, GraphQLScalarValue};
 use serde::Deserialize;
 use ssh2::Session;
 
@@ -109,12 +109,12 @@ impl MutationRoot {
     }
 }
 
-type StringStream = Pin<Box<dyn Stream<Item = String> + Send>>;
+type BufferStream = Pin<Box<dyn Stream<Item = i32> + Send>>;
 
 #[graphql_subscription(context = Context)]
 impl Subscription {
-    async fn hello_world() -> StringStream {
-        let stream = futures::stream::iter(vec![String::from("hello world")]);
+    async fn hello_world() -> BufferStream {
+        let stream = futures::stream::iter(vec![4, 10, 11]);
         Box::pin(stream)
     }
 }
