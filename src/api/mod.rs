@@ -21,24 +21,28 @@ async fn read_file(
 
 //stream buffer to client
 fn buffer_response(mut x: Vec<u8>) -> HttpResponse {
-    let stream: AsyncStream<Result<Bytes, Error>, _> = try_stream! {
-        loop{
-            if x.len()>=4096{
-                let u:Vec<u8>=x.drain(0..4096).collect();
-                if x.len()==0{
-                    break
+    if x.len() <= 4096 {
+        HttpResponse::Ok().body(x)
+    } else {
+        let stream: AsyncStream<Result<Bytes, Error>, _> = try_stream! {
+            loop{
+                if x.len()>4096{
+                    let u:Vec<u8>=x.drain(0..4096).collect();
+
+                    yield Bytes::copy_from_slice(&u[..4096]);
+                }else{
+                    let u:Vec<u8>=x.drain(0..x.len()).collect();
+                    if u.len()==0{
+                        break
+                    }
+
+                    log::info!("{:?} {} \n\n", &u, u.len());
+
+                    yield Bytes::copy_from_slice(&u[..u.len()]);
+
                 }
-                yield Bytes::copy_from_slice(&u[..4096]);
-            }else{
-                let u:Vec<u8>=x.drain(0..x.len()).collect();
-                if x.len()==0{
-                    break
-                }
-                yield Bytes::copy_from_slice(&u[..x.len()]);
             }
-
-        }
-    };
-
-    HttpResponse::Ok().streaming(stream)
+        };
+        HttpResponse::Ok().streaming(stream)
+    }
 }
