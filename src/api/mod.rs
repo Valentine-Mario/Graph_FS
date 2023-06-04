@@ -21,10 +21,12 @@ async fn read_file(
 
 //stream buffer to client
 fn buffer_response(mut x: Vec<u8>) -> HttpResponse {
+    //if buffer is less han 4kb, just return buffer
     if x.len() <= 4096 {
         HttpResponse::Ok().body(x)
     } else {
         let stream: AsyncStream<Result<Bytes, Error>, _> = try_stream! {
+            //stream large buffer files
             loop{
                 if x.len()>4096{
                     let u:Vec<u8>=x.drain(0..4096).collect();
@@ -35,9 +37,6 @@ fn buffer_response(mut x: Vec<u8>) -> HttpResponse {
                     if u.len()==0{
                         break
                     }
-
-                    log::info!("{:?} {} \n\n", &u, u.len());
-
                     yield Bytes::copy_from_slice(&u[..u.len()]);
 
                 }
