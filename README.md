@@ -1,4 +1,4 @@
-## GrapFS
+## GraphFS
 
 GraphFS is a GrapQL interface for interfacing with a file system.   It works with both remote or local file system
 
