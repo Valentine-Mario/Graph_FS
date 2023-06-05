@@ -34,7 +34,7 @@ impl QueryRoot {
         let to_path = Path::new(&to);
         check_auth_path(&to_path)?;
         fs::rename(from_path, to_path)?;
-        Ok(Message::new(String::from("Action completed successfully")))
+        Ok(Message::new(String::from("Item renamed successfully")))
     }
 
     #[graphql(description = "This query is used for moving a group of files or folders")]
@@ -47,6 +47,21 @@ impl QueryRoot {
         }
         let options = dir::CopyOptions::new();
         move_items(&from, to, &options)?;
-        Ok(Message::new(String::from("Action completed successfully")))
+        Ok(Message::new(String::from("Item moved successfully")))
+    }
+
+    #[graphql(description = "delete directory")]
+    fn delete_dir(path: String) -> FieldResult<Message> {
+        let path = Path::new(&path);
+        check_auth_path(&path)?;
+        fs::remove_dir_all(path)?;
+        Ok(Message::new(String::from("Dir deleted successfully")))
+    }
+
+    fn delete_file(path: String) -> FieldResult<Message> {
+        let path = Path::new(&path);
+        check_auth_path(&path)?;
+        fs::remove_file(path)?;
+        Ok(Message::new(String::from("File deleted successfully")))
     }
 }
