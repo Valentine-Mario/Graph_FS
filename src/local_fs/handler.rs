@@ -100,7 +100,7 @@ impl QueryRoot {
             .append(true)
             .create(false)
             .open(path)?;
-        file.seek(SeekFrom::Start(seek as u64)).unwrap();
+        file.seek(SeekFrom::Start(seek as u64))?;
 
         file.write_all(&bytes)?;
         Ok(Message::new(String::from("File updated successfully")))
