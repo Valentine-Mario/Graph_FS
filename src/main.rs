@@ -73,6 +73,7 @@ async fn main() -> io::Result<()> {
             .service(graphql)
             .service(graphql_playground)
             .service(api::read_file)
+            .service(api::upload)
             // the graphiql UI requires CORS to be enabled
             .wrap(Cors::permissive())
             .wrap(middleware::Logger::default())

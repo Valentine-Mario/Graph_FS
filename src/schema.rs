@@ -1,9 +1,9 @@
 use std::pin::Pin;
 
 use juniper::futures::Stream;
+use juniper::Context as JuniperContext;
 use juniper::{futures, graphql_subscription, FieldResult, RootNode};
-use juniper::{graphql_scalar, Context as JuniperContext, GraphQLValueAsync};
-use juniper::{GraphQLEnum, GraphQLInputObject, GraphQLObject, GraphQLScalarValue};
+use juniper::{GraphQLEnum, GraphQLInputObject, GraphQLObject};
 use serde::Deserialize;
 use ssh2::Session;
 
@@ -38,7 +38,7 @@ pub struct Folder {
 }
 
 #[derive(Deserialize)]
-pub struct ReadFileQuery {
+pub struct PathQuery {
     pub path: String,
 }
 
