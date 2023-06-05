@@ -3,12 +3,18 @@ use crate::{
     schema::{Context, File, Folder, Message, QueryRoot},
     utils::check_auth_path,
 };
+use base64::{engine::general_purpose, Engine as _};
 use fs_extra::{
     dir::{self},
     move_items,
 };
 use juniper::FieldResult;
-use std::{fs, path::Path};
+use std::{
+    fs,
+    fs::File as RFile,
+    io::{Seek, SeekFrom, Write},
+    path::Path,
+};
 
 #[juniper::graphql_object(context = Context)]
 impl QueryRoot {
@@ -58,10 +64,45 @@ impl QueryRoot {
         Ok(Message::new(String::from("Dir deleted successfully")))
     }
 
+    #[graphql(description = "delete file")]
     fn delete_file(path: String) -> FieldResult<Message> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
         fs::remove_file(path)?;
         Ok(Message::new(String::from("File deleted successfully")))
+    }
+
+    #[graphql(description = "create directory")]
+    fn create_dir(path: String) -> FieldResult<Message> {
+        let path = Path::new(&path);
+        check_auth_path(&path)?;
+        fs::create_dir_all(path)?;
+        Ok(Message::new(String::from("Dir created successfully")))
+    }
+
+    #[graphql(description = "create file")]
+    fn create_file(path: String) -> FieldResult<Message> {
+        let path = Path::new(&path);
+        check_auth_path(&path)?;
+        RFile::create(path)?;
+        Ok(Message::new(String::from("File created successfully")))
+    }
+
+    #[graphql(
+        description = "update a file content at a seek position. For large file, use the upload endpoint. Payload should be in base64 encoding"
+    )]
+    fn update_file(path: String, seek: i32, payload: String) -> FieldResult<Message> {
+        let path = Path::new(&path);
+        check_auth_path(&path)?;
+        let bytes = general_purpose::STANDARD.decode(payload)?;
+        let mut file = fs::OpenOptions::new()
+            .read(true)
+            .append(true)
+            .create(false)
+            .open(path)?;
+        file.seek(SeekFrom::Start(seek as u64)).unwrap();
+
+        file.write_all(&bytes)?;
+        Ok(Message::new(String::from("File updated successfully")))
     }
 }

@@ -986,6 +986,7 @@ dependencies = [
  "actix-web",
  "actix-web-lab",
  "async-stream",
+ "base64 0.21.2",
  "bytes",
  "dotenv",
  "env_logger",
