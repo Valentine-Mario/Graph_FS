@@ -6,6 +6,13 @@ use std::{
 
 use crate::schema::{File, Folder};
 use fs_extra::dir::{get_dir_content2, DirOptions};
+use std::net::TcpStream;
+
+use ssh2::Session;
+
+use crate::cli::Args;
+
+//Lib for local FS
 
 pub fn get_file_list(path: &Path) -> Result<Vec<File>, Error> {
     let file_list = fs::read_dir(path)?
@@ -74,5 +81,47 @@ fn get_dir_content_length(path: &Path) -> Result<i32, Error> {
                 "error getting folder content",
             ))
         }
+    }
+}
+
+//Lib for remote FS
+
+//ssh connection
+pub fn connection(args: &Args, mut sess: Session) -> Result<Session, std::io::Error> {
+    let args = args.clone();
+    let url_host = format!(
+        "{}:{}",
+        args.remote_host.unwrap(),
+        args.remote_port.unwrap()
+    );
+    let tcp = TcpStream::connect(url_host)?;
+    sess.set_tcp_stream(tcp);
+    sess.handshake()?;
+    match args.auth_option {
+        Some(auth_option) => {
+            match auth_option {
+                crate::cli::AuthOption::UserauthAgent => {
+                    sess.userauth_agent(&args.username.unwrap()).unwrap();
+                }
+                crate::cli::AuthOption::UserauthPassword => {
+                    sess.userauth_password(&args.username.unwrap(), &args.password.unwrap())
+                        .unwrap();
+                }
+                crate::cli::AuthOption::UserauthPubkeyFile => {
+                    sess.userauth_pubkey_file(
+                        &args.username.unwrap(),
+                        Some(Path::new(&args.pub_key.unwrap())),
+                        Path::new(&args.private_key.unwrap()),
+                        Some(&args.pass_phrase.unwrap()),
+                    )
+                    .unwrap();
+                }
+            }
+            Ok(sess)
+        }
+        None => Err(Error::new(
+            ErrorKind::InvalidData,
+            "No auth option provided",
+        )),
     }
 }

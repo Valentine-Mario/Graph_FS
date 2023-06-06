@@ -17,6 +17,10 @@ pub struct Args {
     #[structopt(long = "auth_path")]
     pub authorized_path: String,
 
+    //define workers
+    #[structopt[short = "w", long = "worker"]]
+    pub worker: Option<usize>,
+
     //simple deploy payload
     #[structopt(long = "remote")]
     pub remote: Option<bool>,

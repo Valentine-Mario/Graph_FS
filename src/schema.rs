@@ -99,7 +99,7 @@ impl Folder {
 
 #[juniper::graphql_object(context = Context)]
 impl MutationRoot {
-    fn create_human(context: &Context, new_human: NewHuman) -> FieldResult<Human> {
+    fn create_human(_context: &Context, new_human: NewHuman) -> FieldResult<Human> {
         Ok(Human {
             id: 235,
             name: new_human.name,

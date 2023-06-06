@@ -1,6 +1,6 @@
 use super::utils::{get_file_list, get_folder_list};
 use crate::{
-    schema::{Context, File, Folder, Message, QueryRoot},
+    schema::{Context, File, Folder, Message},
     utils::check_auth_path,
 };
 use base64::{engine::general_purpose, Engine as _};
@@ -15,9 +15,10 @@ use std::{
     io::{Seek, SeekFrom, Write},
     path::Path,
 };
+pub struct LocalFsQuery;
 
 #[juniper::graphql_object(context = Context)]
-impl QueryRoot {
+impl LocalFsQuery {
     #[graphql(description = "Returns a list of all files in directory")]
     fn read_file_in_dir(path: String) -> FieldResult<Vec<File>> {
         let path = Path::new(&path);

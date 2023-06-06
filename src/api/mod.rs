@@ -1,7 +1,7 @@
 use std::io::Error;
 use std::path::Path;
 
-use crate::{schema, utils, Sess};
+use crate::{schema, utils, Session};
 use actix_web::HttpResponse;
 use actix_web::{route, web, HttpRequest, Responder};
 use async_stream::__private::AsyncStream;
@@ -50,9 +50,9 @@ pub async fn upload(
 }
 
 #[route("/get_remote_file", method = "GET")]
-pub async fn read_remote_file(sess: web::Data<Sess>) -> Result<HttpResponse, Error> {
+pub async fn read_remote_file(sess: web::Data<Session>) -> Result<HttpResponse, Error> {
     log::info!("session authenticated {}", sess.authenticated());
-    sess.sftp().unwrap().mkdir(Path::new("ffff"), 10).unwrap();
+    sess.sftp().unwrap().mkdir(Path::new("ffff"), 1).unwrap();
     Ok(HttpResponse::Ok()
         .content_type("text/plain")
         .body("update_succeeded"))
