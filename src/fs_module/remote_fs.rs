@@ -27,9 +27,29 @@ impl RemoteFsQuery {
         let path = Path::new(&path);
         check_auth_path(&path)?;
         let sftp = context.sess.sftp()?;
-        //use 777 as mode if none provided
+        //use 1000 as mode if none provided
         sftp.mkdir(path, mode.unwrap_or(1000))?;
         let return_msg = format!("{} created successfully", path.to_str().unwrap());
+        Ok(Message::new(String::from(return_msg)))
+    }
+
+    #[graphql(description = "delete a file")]
+    fn delete_file(context: &Context, path: String) -> FieldResult<Message> {
+        let path = Path::new(&path);
+        check_auth_path(&path)?;
+        let sftp = context.sess.sftp()?;
+        sftp.unlink(path)?;
+        let return_msg = format!("{} deleted successfully", path.to_str().unwrap());
+        Ok(Message::new(String::from(return_msg)))
+    }
+
+    #[graphql(description = "delete a folder")]
+    fn delete_dir(context: &Context, path: String) -> FieldResult<Message> {
+        let path = Path::new(&path);
+        check_auth_path(&path)?;
+        let sftp = context.sess.sftp()?;
+        sftp.rmdir(path)?;
+        let return_msg = format!("{} deleted successfully", path.to_str().unwrap());
         Ok(Message::new(String::from(return_msg)))
     }
 }
