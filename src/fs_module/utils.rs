@@ -1,14 +1,17 @@
 use std::{
-    fs,
+    fmt, fs,
     io::{Error, ErrorKind},
     path::Path,
 };
 
-use crate::schema::{File, Folder};
+use crate::{
+    schema::{File, Folder},
+    utils::map_enum,
+};
 use fs_extra::dir::{get_dir_content2, DirOptions};
 use std::net::TcpStream;
 
-use ssh2::Session;
+use ssh2::{FileType, Session, Sftp};
 
 use crate::cli::Args;
 
@@ -124,4 +127,39 @@ pub fn connection(args: &Args, mut sess: Session) -> Result<Session, std::io::Er
             "No auth option provided",
         )),
     }
+}
+
+pub fn get_remote_file_list(path: &Path, sftp: Sftp) -> Result<Vec<File>, Error> {
+    let file_list = sftp
+        .readdir(path)?
+        .into_iter()
+        .filter(|r| r.1.is_file())
+        .map(|x| {
+            let name = x.0.to_str().unwrap().to_string();
+            let size = x.1.size.unwrap_or(0) as f64;
+            let file_type = map_enum(x.1.file_type()).to_string();
+            let parent_folder = get_parent_folder(&x.0)?;
+
+            Ok(File::new(name, size, file_type, parent_folder))
+        })
+        .collect::<Result<Vec<File>, Error>>();
+
+    file_list
+}
+
+pub fn get_remote_folder_list(path: &Path, sftp: Sftp) -> Result<Vec<Folder>, Error> {
+    let folder_list = sftp
+        .readdir(path)?
+        .into_iter()
+        .filter(|r| r.1.is_dir())
+        .map(|x| {
+            let name = x.0.to_str().unwrap().to_string();
+            let content_length = 0;
+            let parent_folder = get_parent_folder(&x.0)?;
+
+            Ok(Folder::new(name, content_length, parent_folder))
+        })
+        .collect::<Result<Vec<Folder>, Error>>();
+
+    folder_list
 }

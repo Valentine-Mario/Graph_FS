@@ -7,6 +7,18 @@ use juniper::{GraphQLEnum, GraphQLInputObject, GraphQLObject};
 use serde::Deserialize;
 use ssh2::Session;
 
+#[derive(Debug, Clone, Copy)]
+pub enum MySshFileType {
+    NamedPipe,
+    CharDevice,
+    BlockDevice,
+    Directory,
+    RegularFile,
+    Symlink,
+    Socket,
+    Other,
+}
+
 #[derive(GraphQLEnum)]
 pub enum Episode {
     NewHope,

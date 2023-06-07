@@ -75,7 +75,6 @@ async fn main() -> io::Result<()> {
             let mut sess: Session = Session::new().expect("failed to connect to ssh");
             //create authenticated session
             sess = fs_module::utils::connection(&args, sess).expect("Error creating sessions");
-
             App::new()
                 .app_data(Data::from(schema.clone()))
                 .service(graphql)

@@ -9,6 +9,4 @@ impl QueryRoot {
     fn remote_fs(&self) -> super::remote_fs::RemoteFsQuery {
         super::remote_fs::RemoteFsQuery
     }
-
-    //remote FS query
 }
