@@ -16,7 +16,20 @@ impl RemoteFsQuery {
         check_auth_path(&path)?;
         let sftp = context.sess.sftp()?;
         sftp.create(path)?;
-        let return_msg = format!("{:?} created successfully", path);
+        let return_msg = format!("{} created successfully", path.to_str().unwrap());
+        Ok(Message::new(String::from(return_msg)))
+    }
+
+    #[graphql(
+        description = "create directory. Set mode optionally, would default to allow user read and write without sudo"
+    )]
+    fn create_dir(context: &Context, path: String, mode: Option<i32>) -> FieldResult<Message> {
+        let path = Path::new(&path);
+        check_auth_path(&path)?;
+        let sftp = context.sess.sftp()?;
+        //use 777 as mode if none provided
+        sftp.mkdir(path, mode.unwrap_or(1000))?;
+        let return_msg = format!("{} created successfully", path.to_str().unwrap());
         Ok(Message::new(String::from(return_msg)))
     }
 }

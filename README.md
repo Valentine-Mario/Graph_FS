@@ -22,6 +22,7 @@ Graphql playground: `/graphiql` (GraphQL doc exist here)
 
 
 ### Remote setup
+#### Please note that the remote FS only works with a unix based or linux FS
 To setup with a remote filesystem
 
 * Run `cargo build` followed by :
