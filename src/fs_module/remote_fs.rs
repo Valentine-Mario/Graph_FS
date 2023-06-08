@@ -69,4 +69,16 @@ impl RemoteFsQuery {
         let sftp = context.sess.sftp()?;
         Ok(get_remote_folder_list(&path, &sftp)?)
     }
+
+    #[graphql(description = "rename a file or folder, also used to move item")]
+    fn rename_item(context: &Context, from: String, to: String)-> FieldResult<Message> {
+        let from_path = Path::new(&from);
+        check_auth_path(&from_path)?;
+
+        let to_path = Path::new(&to);
+        check_auth_path(&to_path)?;
+        let sftp = context.sess.sftp()?;
+        sftp.rename(from_path, to_path, None)?;
+        Ok(Message::new(String::from("Operation successful")))
+    }
 }
