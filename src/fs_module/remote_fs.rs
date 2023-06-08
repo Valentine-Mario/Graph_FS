@@ -3,7 +3,8 @@ use std::path::Path;
 use juniper::FieldResult;
 
 use crate::{
-    schema::{Context, Message},
+    fs_module::utils::{get_remote_file_list, get_remote_folder_list},
+    schema::{Context, File, Folder, Message},
     utils::check_auth_path,
 };
 pub struct RemoteFsQuery;
@@ -51,5 +52,21 @@ impl RemoteFsQuery {
         sftp.rmdir(path)?;
         let return_msg = format!("{} deleted successfully", path.to_str().unwrap());
         Ok(Message::new(String::from(return_msg)))
+    }
+
+    #[graphql(description = "Returns a list of all files in directory")]
+    fn read_file_in_dir(context: &Context, path: String) -> FieldResult<Vec<File>> {
+        let path = Path::new(&path);
+        check_auth_path(&path)?;
+        let sftp = context.sess.sftp()?;
+        Ok(get_remote_file_list(&path, sftp)?)
+    }
+
+    #[graphql(description = "Returns a list of all dir in directory")]
+    fn read_dir_in_dir(context: &Context, path: String) -> FieldResult<Vec<Folder>> {
+        let path = Path::new(&path);
+        check_auth_path(&path)?;
+        let sftp = context.sess.sftp()?;
+        Ok(get_remote_folder_list(&path, &sftp)?)
     }
 }

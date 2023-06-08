@@ -1,5 +1,5 @@
 use std::{
-    fmt, fs,
+    fs,
     io::{Error, ErrorKind},
     path::Path,
 };
@@ -11,7 +11,7 @@ use crate::{
 use fs_extra::dir::{get_dir_content2, DirOptions};
 use std::net::TcpStream;
 
-use ssh2::{FileType, Session, Sftp};
+use ssh2::{Session, Sftp};
 
 use crate::cli::Args;
 
@@ -147,14 +147,14 @@ pub fn get_remote_file_list(path: &Path, sftp: Sftp) -> Result<Vec<File>, Error>
     file_list
 }
 
-pub fn get_remote_folder_list(path: &Path, sftp: Sftp) -> Result<Vec<Folder>, Error> {
+pub fn get_remote_folder_list(path: &Path, sftp: &Sftp) -> Result<Vec<Folder>, Error> {
     let folder_list = sftp
         .readdir(path)?
         .into_iter()
         .filter(|r| r.1.is_dir())
         .map(|x| {
             let name = x.0.to_str().unwrap().to_string();
-            let content_length = 0;
+            let content_length = get_remote_dir_content_length(&x.0, sftp)? as i32;
             let parent_folder = get_parent_folder(&x.0)?;
 
             Ok(Folder::new(name, content_length, parent_folder))
@@ -162,4 +162,8 @@ pub fn get_remote_folder_list(path: &Path, sftp: Sftp) -> Result<Vec<Folder>, Er
         .collect::<Result<Vec<Folder>, Error>>();
 
     folder_list
+}
+
+fn get_remote_dir_content_length(path: &Path, sftp: &Sftp) -> Result<usize, Error> {
+    Ok(sftp.readdir(path)?.len())
 }
