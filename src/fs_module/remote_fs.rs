@@ -11,6 +11,27 @@ pub struct RemoteFsQuery;
 
 #[juniper::graphql_object(context = Context)]
 impl RemoteFsQuery {
+    #[graphql(description = "Returns a list of all files in directory")]
+    fn read_file_in_dir(context: &Context, path: String) -> FieldResult<Vec<File>> {
+        let path = Path::new(&path);
+        check_auth_path(&path)?;
+        let sftp = context.sess.sftp()?;
+        Ok(get_remote_file_list(&path, sftp)?)
+    }
+
+    #[graphql(description = "Returns a list of all dir in directory")]
+    fn read_dir_in_dir(context: &Context, path: String) -> FieldResult<Vec<Folder>> {
+        let path = Path::new(&path);
+        check_auth_path(&path)?;
+        let sftp = context.sess.sftp()?;
+        Ok(get_remote_folder_list(&path, &sftp)?)
+    }
+}
+
+pub struct RemoteFsMutation;
+
+#[juniper::graphql_object(context = Context)]
+impl RemoteFsMutation {
     #[graphql(description = "create file")]
     fn create_file(context: &Context, path: String) -> FieldResult<Message> {
         let path = Path::new(&path);
@@ -54,24 +75,8 @@ impl RemoteFsQuery {
         Ok(Message::new(String::from(return_msg)))
     }
 
-    #[graphql(description = "Returns a list of all files in directory")]
-    fn read_file_in_dir(context: &Context, path: String) -> FieldResult<Vec<File>> {
-        let path = Path::new(&path);
-        check_auth_path(&path)?;
-        let sftp = context.sess.sftp()?;
-        Ok(get_remote_file_list(&path, sftp)?)
-    }
-
-    #[graphql(description = "Returns a list of all dir in directory")]
-    fn read_dir_in_dir(context: &Context, path: String) -> FieldResult<Vec<Folder>> {
-        let path = Path::new(&path);
-        check_auth_path(&path)?;
-        let sftp = context.sess.sftp()?;
-        Ok(get_remote_folder_list(&path, &sftp)?)
-    }
-
     #[graphql(description = "rename a file or folder, also used to move item")]
-    fn rename_item(context: &Context, from: String, to: String)-> FieldResult<Message> {
+    fn rename_item(context: &Context, from: String, to: String) -> FieldResult<Message> {
         let from_path = Path::new(&from);
         check_auth_path(&from_path)?;
 

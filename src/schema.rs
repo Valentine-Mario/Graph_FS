@@ -2,8 +2,8 @@ use std::pin::Pin;
 
 use juniper::futures::Stream;
 use juniper::Context as JuniperContext;
-use juniper::{futures, graphql_subscription, FieldResult, RootNode};
-use juniper::{GraphQLEnum, GraphQLInputObject, GraphQLObject};
+use juniper::{futures, graphql_subscription, RootNode};
+use juniper::{GraphQLEnum, GraphQLObject};
 use serde::Deserialize;
 use ssh2::Session;
 
@@ -60,23 +60,6 @@ pub struct Message {
     pub msg: String,
 }
 
-#[derive(GraphQLObject)]
-#[graphql(description = "A humanoid creature in the Star Wars universe")]
-pub struct Human {
-    pub id: i32,
-    pub name: String,
-    pub appears_in: Vec<Episode>,
-    pub home_planet: String,
-}
-
-#[derive(GraphQLInputObject)]
-#[graphql(description = "A humanoid creature in the Star Wars universe")]
-struct NewHuman {
-    name: String,
-    appears_in: Vec<Episode>,
-    home_planet: String,
-}
-
 pub struct QueryRoot;
 
 pub struct MutationRoot;
@@ -106,18 +89,6 @@ impl Folder {
             content_length,
             parent_folder,
         }
-    }
-}
-
-#[juniper::graphql_object(context = Context)]
-impl MutationRoot {
-    fn create_human(_context: &Context, new_human: NewHuman) -> FieldResult<Human> {
-        Ok(Human {
-            id: 235,
-            name: new_human.name,
-            appears_in: new_human.appears_in,
-            home_planet: new_human.home_planet,
-        })
     }
 }
 

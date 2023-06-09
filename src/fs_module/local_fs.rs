@@ -32,7 +32,12 @@ impl LocalFsQuery {
         check_auth_path(&path)?;
         Ok(get_folder_list(&path)?)
     }
+}
 
+pub struct LocalFsMutation;
+
+#[juniper::graphql_object(context = Context)]
+impl LocalFsMutation {
     #[graphql(description = "This query can be used to rename files or folders")]
     fn rename_item(from: String, to: String) -> FieldResult<Message> {
         let from_path = Path::new(&from);
