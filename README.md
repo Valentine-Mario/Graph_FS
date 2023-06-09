@@ -45,4 +45,6 @@ To define workers you can add the flag `-w <number of workers>` this is optional
 
 #### You should be able to access the local fs api and graphql endpoints while in remote mode.
 
-The remote endpoins are still in development
+Read endpoint `/get_remote_file?path=<path to read>`
+Upload endpoint `/add_remote_file?path=<directory to upload>`
+Graphql playground: `/graphiql` (GraphQL doc exist here)
