@@ -5,6 +5,7 @@ use crate::{
 };
 use base64::{engine::general_purpose, Engine as _};
 use fs_extra::{
+    copy_items,
     dir::{self},
     move_items,
 };
@@ -38,7 +39,7 @@ pub struct LocalFsMutation;
 
 #[juniper::graphql_object(context = Context)]
 impl LocalFsMutation {
-    #[graphql(description = "This query can be used to rename files or folders")]
+    #[graphql(description = "This mutation can be used to rename files or folders")]
     fn rename_item(from: String, to: String) -> FieldResult<Message> {
         let from_path = Path::new(&from);
         check_auth_path(&from_path)?;
@@ -49,7 +50,7 @@ impl LocalFsMutation {
         Ok(Message::new(String::from("Item renamed successfully")))
     }
 
-    #[graphql(description = "This query is used for moving a group of files or folders")]
+    #[graphql(description = "This mutation is used for moving file(s) or folder(s)")]
     fn move_item(from: Vec<String>, to: String) -> FieldResult<Message> {
         let to_path = Path::new(&to);
         check_auth_path(&to_path)?;
@@ -60,6 +61,19 @@ impl LocalFsMutation {
         let options = dir::CopyOptions::new();
         move_items(&from, to, &options)?;
         Ok(Message::new(String::from("Item moved successfully")))
+    }
+
+    #[graphql(description = "this mutation is to copy an item or group of items")]
+    fn copy_item(from: Vec<String>, to: String) -> FieldResult<Message> {
+        let to_path = Path::new(&to);
+        check_auth_path(&to_path)?;
+        //check if all from destination is permitted diurectory
+        for item in from.iter() {
+            check_auth_path(&Path::new(&item))?;
+        }
+        let options = dir::CopyOptions::new();
+        copy_items(&from, to, &options)?;
+        Ok(Message::new(String::from("items copied successfully")))
     }
 
     #[graphql(description = "delete directory")]
