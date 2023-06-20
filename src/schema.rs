@@ -39,6 +39,7 @@ pub struct File {
     pub size: f64,
     pub file_type: String,
     pub parent_folder: String,
+    pub last_modified: f64,
 }
 
 #[derive(GraphQLObject, Debug)]
@@ -72,12 +73,19 @@ impl Message {
 }
 
 impl File {
-    pub fn new(name: String, size: f64, file_type: String, parent_folder: String) -> Self {
+    pub fn new(
+        name: String,
+        size: f64,
+        file_type: String,
+        parent_folder: String,
+        last_modified: f64,
+    ) -> Self {
         Self {
             name,
             size,
             file_type,
             parent_folder,
+            last_modified,
         }
     }
 }

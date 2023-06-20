@@ -2,6 +2,7 @@ use std::{
     fs,
     io::{Error, ErrorKind},
     path::Path,
+    time::SystemTime,
 };
 
 use crate::{
@@ -28,8 +29,15 @@ pub fn get_file_list(path: &Path) -> Result<Vec<File>, Error> {
             let name = x.to_str().unwrap().to_string();
             let file_type = get_file_type(&name)?;
             let parent_folder = get_parent_folder(&x)?;
+            let last_modified = last_modified(&x)?;
 
-            Ok(File::new(name, size, file_type, parent_folder))
+            Ok(File::new(
+                name,
+                size,
+                file_type,
+                parent_folder,
+                last_modified,
+            ))
         })
         .collect::<Result<Vec<File>, Error>>();
     file_list
@@ -55,6 +63,17 @@ pub fn get_folder_list(path: &Path) -> Result<Vec<Folder>, Error> {
 
 fn get_file_size(path: &Path) -> Result<f64, Error> {
     Ok((path.metadata()?.len()) as f64)
+}
+
+fn last_modified(path: &Path) -> Result<f64, Error> {
+    let meta = path.metadata()?;
+    if let Ok(time) = meta.modified() {
+        let time = time.duration_since(SystemTime::UNIX_EPOCH).unwrap();
+        let subsec_millis = time.as_secs() as f64;
+        Ok(subsec_millis)
+    } else {
+        Ok(0 as f64)
+    }
 }
 
 fn get_file_type(name: &str) -> Result<String, Error> {
@@ -139,8 +158,15 @@ pub fn get_remote_file_list(path: &Path, sftp: Sftp) -> Result<Vec<File>, Error>
             let size = x.1.size.unwrap_or(0) as f64;
             let file_type = map_enum(x.1.file_type()).to_string();
             let parent_folder = get_parent_folder(&x.0)?;
+            let last_modified = x.1.mtime.unwrap_or(0) as f64;
 
-            Ok(File::new(name, size, file_type, parent_folder))
+            Ok(File::new(
+                name,
+                size,
+                file_type,
+                parent_folder,
+                last_modified,
+            ))
         })
         .collect::<Result<Vec<File>, Error>>();
 
