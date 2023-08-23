@@ -83,7 +83,7 @@ async fn main() -> io::Result<()> {
                 .service(api::upload_remote_file)
                 .service(api::read_file)
                 .service(api::upload)
-                // The graphiql UI requires CORS to be enabled
+                // The GraphiQL UI requires CORS to be enabled
                 .wrap(Cors::permissive())
                 // App data pass authethicated session to handlers
                 .app_data(Data::new(sess))
@@ -102,7 +102,7 @@ async fn main() -> io::Result<()> {
                 .service(graphql_playground)
                 .service(api::read_file)
                 .service(api::upload)
-                // The graphiql UI requires CORS to be enabled
+                // The GraphiQL UI requires CORS to be enabled
                 .wrap(Cors::permissive())
                 .wrap(middleware::Logger::default())
         })
