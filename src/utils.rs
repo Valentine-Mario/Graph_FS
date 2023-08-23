@@ -15,7 +15,7 @@ pub fn check_auth_path(child: &Path) -> Result<bool, Error> {
     }
 }
 
-//map ssh filetype to my filetype
+// Map SSH filetype to my filetype
 pub fn map_enum(input: FileType) -> MySshFileType {
     match input {
         FileType::BlockDevice => MySshFileType::BlockDevice,

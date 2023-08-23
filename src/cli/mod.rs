@@ -5,55 +5,55 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt, Clone)]
 #[structopt(name = "GraphFS ", about = "GraphFS tool")]
 pub struct Args {
-    //select host
+    // Select host
     #[structopt(short = "h", long = "host")]
     pub host: String,
 
-    //select port
+    // Select port
     #[structopt(short = "p", long = "port")]
     pub port: u16,
 
-    //authorized path
+    // Authorized path
     #[structopt(long = "auth_path")]
     pub authorized_path: String,
 
-    //define workers
+    // Define workers
     #[structopt[short = "w", long = "worker"]]
     pub worker: Option<usize>,
 
-    //simple deploy payload
+    // Simple deploy payload
     #[structopt(long = "remote")]
     pub remote: Option<bool>,
 
-    //auth option
+    // Auth option
     #[structopt(long = "auth_option")]
     pub auth_option: Option<AuthOption>,
 
-    //username
-    #[structopt(long = "username", about = "The auth usename")]
+    // Username
+    #[structopt(long = "username", about = "The auth username")]
     pub username: Option<String>,
 
-    //password
+    // Password
     #[structopt(long = "password", about = "The auth password")]
     pub password: Option<String>,
 
-    //publick key
+    // Public key
     #[structopt(long = "public_key")]
     pub pub_key: Option<String>,
 
-    //private key
+    // Private key
     #[structopt(long = "private_key")]
     pub private_key: Option<String>,
 
-    //passphrase
+    // Passphrase
     #[structopt(long = "passphrase")]
     pub pass_phrase: Option<String>,
 
-    //remote host
+    // Remote host
     #[structopt(long = "remote_host")]
     pub remote_host: Option<String>,
 
-    //remote port
+    // Remote port
     #[structopt(long = "remote_port")]
     pub remote_port: Option<String>,
 }
@@ -65,13 +65,13 @@ impl Args {
 }
 
 #[derive(Debug, Clone)]
-///Auth options for ssh credentials
+/// Auth options for ssh credentials
 pub enum AuthOption {
-    ///Attempt basic password authentication.
+    /// Attempt basic password authentication.
     UserauthPassword,
-    ///authenticate the current connection with the first public key found in an SSH agent
+    /// Authenticate the current connection with the first public key found in an SSH agent
     UserauthAgent,
-    ///Attempt public key authentication using a PEM encoded private key file stored on disk.
+    /// Attempt public key authentication using a PEM encoded private key file stored on disk.
     UserauthPubkeyFile,
 }
 

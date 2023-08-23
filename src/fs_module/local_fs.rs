@@ -54,7 +54,7 @@ impl LocalFsMutation {
     fn move_item(from: Vec<String>, to: String) -> FieldResult<Message> {
         let to_path = Path::new(&to);
         check_auth_path(&to_path)?;
-        //check if all from destination is permitted diurectory
+        // Check if all from destination is permitted diurectory
         for item in from.iter() {
             check_auth_path(&Path::new(&item))?;
         }
@@ -63,28 +63,28 @@ impl LocalFsMutation {
         Ok(Message::new(String::from("Item moved successfully")))
     }
 
-    #[graphql(description = "this mutation is to copy an item or group of items")]
+    #[graphql(description = "This mutation is to copy an item or group of items")]
     fn copy_item(from: Vec<String>, to: String) -> FieldResult<Message> {
         let to_path = Path::new(&to);
         check_auth_path(&to_path)?;
-        //check if all from destination is permitted diurectory
+        // Check if all from destination is permitted diurectory
         for item in from.iter() {
             check_auth_path(&Path::new(&item))?;
         }
         let options = dir::CopyOptions::new();
         copy_items(&from, to, &options)?;
-        Ok(Message::new(String::from("items copied successfully")))
+        Ok(Message::new(String::from("Items copied successfully")))
     }
 
-    #[graphql(description = "delete directory")]
+    #[graphql(description = "Delete directory")]
     fn delete_dir(path: String) -> FieldResult<Message> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
         fs::remove_dir_all(path)?;
-        Ok(Message::new(String::from("Dir deleted successfully")))
+        Ok(Message::new(String::from("Directory deleted successfully")))
     }
 
-    #[graphql(description = "delete file")]
+    #[graphql(description = "Delete file")]
     fn delete_file(path: String) -> FieldResult<Message> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
@@ -92,15 +92,15 @@ impl LocalFsMutation {
         Ok(Message::new(String::from("File deleted successfully")))
     }
 
-    #[graphql(description = "create directory")]
+    #[graphql(description = "Create directory")]
     fn create_dir(path: String) -> FieldResult<Message> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
         fs::create_dir_all(path)?;
-        Ok(Message::new(String::from("Dir created successfully")))
+        Ok(Message::new(String::from("Directory created successfully")))
     }
 
-    #[graphql(description = "create file")]
+    #[graphql(description = "Create file")]
     fn create_file(path: String) -> FieldResult<Message> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
@@ -109,7 +109,7 @@ impl LocalFsMutation {
     }
 
     #[graphql(
-        description = "update a file content at a seek position. For large file, use the upload endpoint. Payload should be in base64 encoding"
+        description = "Update a file content at a seek position. For large file, use the upload endpoint. Payload should be in base64 encoding"
     )]
     fn update_file(path: String, seek: i32, payload: String) -> FieldResult<Message> {
         let path = Path::new(&path);
