@@ -16,7 +16,7 @@ use ssh2::{Session, Sftp};
 
 use crate::cli::Args;
 
-//Lib for local FS
+// Lib for local FS
 
 pub fn get_file_list(path: &Path) -> Result<Vec<File>, Error> {
     let file_list = fs::read_dir(path)?
@@ -100,15 +100,15 @@ fn get_dir_content_length(path: &Path) -> Result<i32, Error> {
         Err(_) => {
             return Err(Error::new(
                 ErrorKind::InvalidInput,
-                "error getting folder content",
+                "Error getting folder content",
             ))
         }
     }
 }
 
-//Lib for remote FS
+// Lib for remote FS
 
-//ssh connection
+// SSH connection
 pub fn connection(args: &Args, mut sess: Session) -> Result<Session, std::io::Error> {
     let args = args.clone();
     let url_host = format!(

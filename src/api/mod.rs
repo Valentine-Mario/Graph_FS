@@ -11,7 +11,7 @@ use util::*;
 #[route("/get_local_file", method = "GET")]
 async fn read_file(
     req: HttpRequest,
-    //read file path
+    // Read file path
     info: web::Query<schema::PathQuery>,
 ) -> Result<impl Responder, Error> {
     let file_path = std::path::Path::new(&info.path);
@@ -23,7 +23,7 @@ async fn read_file(
 #[route("/add_local_file", method = "POST")]
 pub async fn upload(
     payload: Multipart,
-    //directory you want to add file
+    // Directory you want to add file
     info: web::Query<schema::PathQuery>,
 ) -> Result<HttpResponse, Error> {
     let file_path = std::path::Path::new(&info.path);
@@ -60,7 +60,7 @@ pub async fn read_remote_file(
 pub async fn upload_remote_file(
     sess: web::Data<Session>,
     payload: Multipart,
-    //directory you want to add file
+    // Directory you want to add file
     info: web::Query<schema::PathQuery>,
 ) -> Result<HttpResponse, Error> {
     let file_path = std::path::Path::new(&info.path);

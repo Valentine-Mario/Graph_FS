@@ -19,7 +19,7 @@ impl RemoteFsQuery {
         Ok(get_remote_file_list(&path, sftp)?)
     }
 
-    #[graphql(description = "Returns a list of all dir in directory")]
+    #[graphql(description = "Returns a list of all directories in directory")]
     fn read_dir_in_dir(context: &Context, path: String) -> FieldResult<Vec<Folder>> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
@@ -32,7 +32,7 @@ pub struct RemoteFsMutation;
 
 #[juniper::graphql_object(context = Context)]
 impl RemoteFsMutation {
-    #[graphql(description = "create file")]
+    #[graphql(description = "Create file")]
     fn create_file(context: &Context, path: String) -> FieldResult<Message> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
@@ -43,19 +43,19 @@ impl RemoteFsMutation {
     }
 
     #[graphql(
-        description = "create directory. Set mode optionally, would default to allow user read and write without sudo"
+        description = "Create directory. Set mode optionally, would default to allow user read and write without sudo"
     )]
     fn create_dir(context: &Context, path: String, mode: Option<i32>) -> FieldResult<Message> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
         let sftp = context.sess.sftp()?;
-        //use 1000 as mode if none provided
+        // Use 1000 as mode if none provided
         sftp.mkdir(path, mode.unwrap_or(1000))?;
         let return_msg = format!("{} created successfully", path.to_str().unwrap());
         Ok(Message::new(String::from(return_msg)))
     }
 
-    #[graphql(description = "delete a file")]
+    #[graphql(description = "Delete a file")]
     fn delete_file(context: &Context, path: String) -> FieldResult<Message> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
@@ -65,7 +65,7 @@ impl RemoteFsMutation {
         Ok(Message::new(String::from(return_msg)))
     }
 
-    #[graphql(description = "delete a folder")]
+    #[graphql(description = "Delete a folder")]
     fn delete_dir(context: &Context, path: String) -> FieldResult<Message> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
@@ -75,7 +75,7 @@ impl RemoteFsMutation {
         Ok(Message::new(String::from(return_msg)))
     }
 
-    #[graphql(description = "rename a file or folder, also used to move item")]
+    #[graphql(description = "Rename a file or folder, also used to move item")]
     fn rename_item(context: &Context, from: String, to: String) -> FieldResult<Message> {
         let from_path = Path::new(&from);
         check_auth_path(&from_path)?;

@@ -30,15 +30,15 @@ async fn graphql_playground() -> impl Responder {
 /// GraphQL endpoint
 #[route("/graphql", method = "GET", method = "POST")]
 async fn graphql(st: web::Data<Schema>, data: web::Json<GraphQLRequest>) -> impl Responder {
-    //initialize context here
+    // Initialize context here
     let args = cli::Args::new();
     let sess: Result<Session, ssh2::Error> = Session::new();
 
     match sess {
         Ok(mut sess) => {
-            //for remote fs create an ssh connections
+            // For remote FS create an SSH connections
             if args.remote.is_some() && args.remote.unwrap() {
-                //create authenticated session
+                // Create authenticated session
                 sess = fs_module::utils::connection(&args, sess).unwrap();
             }
 
@@ -50,7 +50,7 @@ async fn graphql(st: web::Data<Schema>, data: web::Json<GraphQLRequest>) -> impl
     }
 }
 
-//main folder
+// Main folder
 #[actix_web::main]
 async fn main() -> io::Result<()> {
     dotenv::dotenv().ok();
@@ -60,20 +60,20 @@ async fn main() -> io::Result<()> {
     // Create Juniper schema
     let schema = Arc::new(create_schema());
 
-    log::info!("starting HTTP server on port {}", args.port);
+    log::info!("Starting HTTP server on port {}", args.port);
     log::info!(
         "GraphiQL playground: http://{}:{}/graphiql",
         args.host,
         args.port
     );
 
-    //handle remote FS http server
+    // Handle remote FS http server
     if args.remote.is_some() && args.remote.unwrap() {
         let arg = args.clone();
         // Start HTTP server
         HttpServer::new(move || {
-            let mut sess: Session = Session::new().expect("failed to connect to ssh");
-            //create authenticated session
+            let mut sess: Session = Session::new().expect("Failed to connect to SSH");
+            // Create authenticated session
             sess = fs_module::utils::connection(&args, sess).expect("Error creating sessions");
             App::new()
                 .app_data(Data::from(schema.clone()))
@@ -83,9 +83,9 @@ async fn main() -> io::Result<()> {
                 .service(api::upload_remote_file)
                 .service(api::read_file)
                 .service(api::upload)
-                // the graphiql UI requires CORS to be enabled
+                // The graphiql UI requires CORS to be enabled
                 .wrap(Cors::permissive())
-                //app data pass authethicated session to handlers
+                // App data pass authethicated session to handlers
                 .app_data(Data::new(sess))
                 .wrap(middleware::Logger::default())
         })
@@ -102,7 +102,7 @@ async fn main() -> io::Result<()> {
                 .service(graphql_playground)
                 .service(api::read_file)
                 .service(api::upload)
-                // the graphiql UI requires CORS to be enabled
+                // The graphiql UI requires CORS to be enabled
                 .wrap(Cors::permissive())
                 .wrap(middleware::Logger::default())
         })

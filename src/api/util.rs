@@ -12,12 +12,12 @@ use uuid::Uuid;
 
 use actix_multipart::Multipart;
 use futures::{StreamExt, TryStreamExt};
-//local util
+// Local util
 pub async fn save_local_file(
     mut payload: Multipart,
     file_path: &Path,
 ) -> Result<Option<bool>, Error> {
-    // iterate over multipart stream
+    // Iterate over multipart stream
     while let Ok(Some(mut field)) = payload.try_next().await {
         let content_type = field.content_disposition();
         let filename = content_type.get_filename().unwrap();
@@ -33,7 +33,7 @@ pub async fn save_local_file(
         // Field in turn is stream of *Bytes* object
         while let Some(chunk) = field.next().await {
             let data = chunk.unwrap();
-            // filesystem operations are blocking, we have to use threadpool
+            // Filesystem operations are blocking, we have to use threadpool
             f = web::block(move || f.write_all(&data).map(|_| f))
                 .await
                 .unwrap()?;
@@ -67,7 +67,7 @@ pub async fn save_remote_file(
     let mut remote_file =
         sessiopn.scp_send(Path::new(&file_name), 0o644, flattened.len() as u64, None)?;
 
-    //write buffer to remote FS
+    // Write buffer to remote FS
     remote_file.write_all(&flattened)?;
     remote_file.send_eof()?;
     remote_file.wait_eof()?;
@@ -76,14 +76,14 @@ pub async fn save_remote_file(
     Ok(Some(true))
 }
 
-//stream buffer to client
+// Stream buffer to client
 pub fn buffer_response(mut x: Vec<u8>) -> HttpResponse {
-    //if buffer is less than 4kb, just return buffer
+    // If buffer is less than 4kb, just return buffer
     if x.len() <= 4096 {
         HttpResponse::Ok().body(x)
     } else {
         let stream: AsyncStream<Result<Bytes, Error>, _> = try_stream! {
-            //stream large buffer files
+            // Stream large buffer files
             loop{
                 if x.len()>4096{
                     let u:Vec<u8>=x.drain(0..4096).collect();
