@@ -13,7 +13,7 @@ use actix_cors::Cors;
 use actix_web::{
     get, middleware, route,
     web::{self, Data},
-    App, HttpResponse, HttpServer, Responder,
+    App, HttpRequest, HttpResponse, HttpServer, Responder,
 };
 use actix_web_lab::respond::Html;
 use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
@@ -29,13 +29,36 @@ async fn graphql_playground() -> impl Responder {
 
 /// GraphQL endpoint
 #[route("/graphql", method = "GET", method = "POST")]
-async fn graphql(st: web::Data<GraphqlWebData>, data: web::Json<GraphQLRequest>) -> impl Responder {
-    //use ssh connection in context
-    let ctx = schema::Context {
-        sess: st.sess.clone(),
-    };
-    let value = data.execute(&st.schema, &ctx).await;
-    HttpResponse::Ok().json(value)
+async fn graphql(
+    st: web::Data<GraphqlWebData>,
+    data: web::Json<GraphQLRequest>,
+    req: HttpRequest,
+) -> impl Responder {
+    let token = req.headers().get("authorization");
+
+    match token {
+        Some(token_value) => {
+            //use ssh connection in context
+            let ctx = schema::Context {
+                sess: st.sess.clone(),
+                //set auth token to context
+                auth_token: Some(token_value.to_str().unwrap().to_string()),
+                args: st.args.clone(),
+            };
+            let value = data.execute(&st.schema, &ctx).await;
+            HttpResponse::Ok().json(value)
+        }
+        None => {
+            //use ssh connection in context
+            let ctx = schema::Context {
+                sess: st.sess.clone(),
+                auth_token: None,
+                args: st.args.clone(),
+            };
+            let value = data.execute(&st.schema, &ctx).await;
+            HttpResponse::Ok().json(value)
+        }
+    }
 }
 
 // Main folder
@@ -64,6 +87,7 @@ async fn main() -> io::Result<()> {
             let remote_data = Arc::new(GraphqlWebData {
                 schema: create_schema(),
                 sess: Some(sess),
+                args: args.clone(),
             });
             App::new()
                 .app_data(Data::from(remote_data))
@@ -82,12 +106,14 @@ async fn main() -> io::Result<()> {
         .run()
         .await
     } else {
+        let arg = args.clone();
         // Start local FS HTTP server
         HttpServer::new(move || {
             //contains only schema
             let local_data = Arc::new(GraphqlWebData {
                 schema: create_schema(),
                 sess: None,
+                args: args.clone(),
             });
             App::new()
                 .app_data(Data::from(local_data))
@@ -99,8 +125,8 @@ async fn main() -> io::Result<()> {
                 .wrap(Cors::permissive())
                 .wrap(middleware::Logger::default())
         })
-        .workers(args.worker.unwrap_or(2))
-        .bind((args.host, args.port))?
+        .workers(arg.worker.unwrap_or(2))
+        .bind((arg.host, arg.port))?
         .run()
         .await
     }

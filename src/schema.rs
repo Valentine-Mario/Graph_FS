@@ -7,6 +7,8 @@ use juniper::{GraphQLEnum, GraphQLObject};
 use serde::Deserialize;
 use ssh2::Session;
 
+use crate::cli::Args;
+
 #[derive(Debug, Clone, Copy)]
 pub enum MySshFileType {
     NamedPipe,
@@ -24,11 +26,6 @@ pub enum Episode {
     NewHope,
     Empire,
     Jedi,
-}
-
-#[derive(Clone)]
-pub struct Context {
-    pub sess: Option<Session>,
 }
 
 impl JuniperContext for Context {}
@@ -123,4 +120,12 @@ pub fn create_schema() -> Schema {
 pub struct GraphqlWebData {
     pub sess: Option<Session>,
     pub schema: Schema,
+    pub args: Args,
+}
+
+#[derive(Clone)]
+pub struct Context {
+    pub sess: Option<Session>,
+    pub auth_token: Option<String>,
+    pub args: Args,
 }
