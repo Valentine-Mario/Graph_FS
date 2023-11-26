@@ -15,7 +15,7 @@ impl RemoteFsQuery {
     fn read_file_in_dir(context: &Context, path: String) -> FieldResult<Vec<File>> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
-        let sftp = context.sess.sftp()?;
+        let sftp = context.sess.as_ref().unwrap().sftp()?;
         Ok(get_remote_file_list(&path, sftp)?)
     }
 
@@ -23,7 +23,7 @@ impl RemoteFsQuery {
     fn read_dir_in_dir(context: &Context, path: String) -> FieldResult<Vec<Folder>> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
-        let sftp = context.sess.sftp()?;
+        let sftp = context.sess.as_ref().unwrap().sftp()?;
         Ok(get_remote_folder_list(&path, &sftp)?)
     }
 }
@@ -36,7 +36,7 @@ impl RemoteFsMutation {
     fn create_file(context: &Context, path: String) -> FieldResult<Message> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
-        let sftp = context.sess.sftp()?;
+        let sftp = context.sess.as_ref().unwrap().sftp()?;
         sftp.create(path)?;
         let return_msg = format!("{} created successfully", path.to_str().unwrap());
         Ok(Message::new(String::from(return_msg)))
@@ -48,7 +48,7 @@ impl RemoteFsMutation {
     fn create_dir(context: &Context, path: String, mode: Option<i32>) -> FieldResult<Message> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
-        let sftp = context.sess.sftp()?;
+        let sftp = context.sess.as_ref().unwrap().sftp()?;
         // Use 1000 as mode if none provided
         sftp.mkdir(path, mode.unwrap_or(1000))?;
         let return_msg = format!("{} created successfully", path.to_str().unwrap());
@@ -59,7 +59,7 @@ impl RemoteFsMutation {
     fn delete_file(context: &Context, path: String) -> FieldResult<Message> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
-        let sftp = context.sess.sftp()?;
+        let sftp = context.sess.as_ref().unwrap().sftp()?;
         sftp.unlink(path)?;
         let return_msg = format!("{} deleted successfully", path.to_str().unwrap());
         Ok(Message::new(String::from(return_msg)))
@@ -69,7 +69,7 @@ impl RemoteFsMutation {
     fn delete_dir(context: &Context, path: String) -> FieldResult<Message> {
         let path = Path::new(&path);
         check_auth_path(&path)?;
-        let sftp = context.sess.sftp()?;
+        let sftp = context.sess.as_ref().unwrap().sftp()?;
         sftp.rmdir(path)?;
         let return_msg = format!("{} deleted successfully", path.to_str().unwrap());
         Ok(Message::new(String::from(return_msg)))
@@ -82,7 +82,7 @@ impl RemoteFsMutation {
 
         let to_path = Path::new(&to);
         check_auth_path(&to_path)?;
-        let sftp = context.sess.sftp()?;
+        let sftp = context.sess.as_ref().unwrap().sftp()?;
         sftp.rename(from_path, to_path, None)?;
         Ok(Message::new(String::from("Operation successful")))
     }

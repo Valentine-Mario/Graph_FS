@@ -45,7 +45,7 @@ pub async fn save_local_file(
 
 pub async fn save_remote_file(
     mut payload: Multipart,
-    sessiopn: web::Data<Session>,
+    sessiopn: &Session,
     file_path: &Path,
 ) -> Result<Option<bool>, Error> {
     let mut return_write: Vec<Vec<u8>> = vec![];

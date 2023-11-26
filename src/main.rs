@@ -19,7 +19,7 @@ use actix_web_lab::respond::Html;
 use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
 use ssh2::Session;
 
-use crate::schema::{create_schema, Schema};
+use crate::schema::{create_schema, GraphqlWebData};
 
 /// GraphiQL playground UI
 #[get("/graphiql")]
@@ -29,25 +29,13 @@ async fn graphql_playground() -> impl Responder {
 
 /// GraphQL endpoint
 #[route("/graphql", method = "GET", method = "POST")]
-async fn graphql(st: web::Data<Schema>, data: web::Json<GraphQLRequest>) -> impl Responder {
-    // Initialize context here
-    let args = cli::Args::new();
-    let sess: Result<Session, ssh2::Error> = Session::new();
-
-    match sess {
-        Ok(mut sess) => {
-            // For remote FS create an SSH connections
-            if args.remote.is_some() && args.remote.unwrap() {
-                // Create authenticated session
-                sess = fs_module::utils::connection(&args, sess).unwrap();
-            }
-
-            let ctx = schema::Context { sess };
-            let user = data.execute(&st, &ctx).await;
-            HttpResponse::Ok().json(user)
-        }
-        Err(_) => HttpResponse::ExpectationFailed().body("Error setting session"),
-    }
+async fn graphql(st: web::Data<GraphqlWebData>, data: web::Json<GraphQLRequest>) -> impl Responder {
+    //use ssh connection in context
+    let ctx = schema::Context {
+        sess: st.sess.clone(),
+    };
+    let value = data.execute(&st.schema, &ctx).await;
+    HttpResponse::Ok().json(value)
 }
 
 // Main folder
@@ -56,9 +44,6 @@ async fn main() -> io::Result<()> {
     dotenv::dotenv().ok();
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
     let args = cli::Args::new();
-
-    // Create Juniper schema
-    let schema = Arc::new(create_schema());
 
     log::info!("Starting HTTP server on port {}", args.port);
     log::info!(
@@ -75,8 +60,13 @@ async fn main() -> io::Result<()> {
             let mut sess: Session = Session::new().expect("Failed to connect to SSH");
             // Create authenticated session
             sess = fs_module::utils::connection(&args, sess).expect("Error creating sessions");
+            //contains schema and ssh auth session
+            let remote_data = Arc::new(GraphqlWebData {
+                schema: create_schema(),
+                sess: Some(sess),
+            });
             App::new()
-                .app_data(Data::from(schema.clone()))
+                .app_data(Data::from(remote_data))
                 .service(graphql)
                 .service(graphql_playground)
                 .service(api::read_remote_file)
@@ -85,8 +75,6 @@ async fn main() -> io::Result<()> {
                 .service(api::upload)
                 // The GraphiQL UI requires CORS to be enabled
                 .wrap(Cors::permissive())
-                // App data pass authethicated session to handlers
-                .app_data(Data::new(sess))
                 .wrap(middleware::Logger::default())
         })
         .workers(arg.worker.unwrap_or(2))
@@ -96,8 +84,13 @@ async fn main() -> io::Result<()> {
     } else {
         // Start local FS HTTP server
         HttpServer::new(move || {
+            //contains only schema
+            let local_data = Arc::new(GraphqlWebData {
+                schema: create_schema(),
+                sess: None,
+            });
             App::new()
-                .app_data(Data::from(schema.clone()))
+                .app_data(Data::from(local_data))
                 .service(graphql)
                 .service(graphql_playground)
                 .service(api::read_file)

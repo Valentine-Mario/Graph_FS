@@ -26,8 +26,9 @@ pub enum Episode {
     Jedi,
 }
 
+#[derive(Clone)]
 pub struct Context {
-    pub sess: Session,
+    pub sess: Option<Session>,
 }
 
 impl JuniperContext for Context {}
@@ -60,10 +61,13 @@ pub struct PathQuery {
 pub struct Message {
     pub msg: String,
 }
-
+#[derive(Debug)]
 pub struct QueryRoot;
 
+#[derive(Debug)]
 pub struct MutationRoot;
+
+#[derive(Debug)]
 pub struct Subscription;
 
 impl Message {
@@ -114,4 +118,9 @@ pub type Schema = RootNode<'static, QueryRoot, MutationRoot, Subscription>;
 
 pub fn create_schema() -> Schema {
     Schema::new(QueryRoot {}, MutationRoot {}, Subscription {})
+}
+
+pub struct GraphqlWebData {
+    pub sess: Option<Session>,
+    pub schema: Schema,
 }

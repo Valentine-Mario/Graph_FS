@@ -1,4 +1,5 @@
-use crate::{schema, utils, Session};
+use crate::schema::GraphqlWebData;
+use crate::{schema, utils};
 use actix_multipart::Multipart;
 use actix_web::HttpResponse;
 use actix_web::{route, web, HttpRequest, Responder};
@@ -46,10 +47,14 @@ pub async fn upload(
 
 #[route("/get_remote_file", method = "GET")]
 pub async fn read_remote_file(
-    sess: web::Data<Session>,
+    sess: web::Data<GraphqlWebData>,
     info: web::Query<schema::PathQuery>,
 ) -> Result<HttpResponse, Error> {
-    let (mut remote_file, _) = sess.scp_recv(&Path::new(&info.path))?;
+    let (mut remote_file, _) = sess
+        .sess
+        .as_ref()
+        .unwrap()
+        .scp_recv(&Path::new(&info.path))?;
 
     let mut contents = Vec::new();
     remote_file.read_to_end(&mut contents)?;
@@ -58,14 +63,14 @@ pub async fn read_remote_file(
 
 #[route("/add_remote_file", method = "POST")]
 pub async fn upload_remote_file(
-    sess: web::Data<Session>,
+    sess: web::Data<GraphqlWebData>,
     payload: Multipart,
     // Directory you want to add file
     info: web::Query<schema::PathQuery>,
 ) -> Result<HttpResponse, Error> {
     let file_path = std::path::Path::new(&info.path);
     utils::check_auth_path(file_path)?;
-    let upload_status = save_remote_file(payload, sess, &file_path).await;
+    let upload_status = save_remote_file(payload, sess.sess.as_ref().unwrap(), &file_path).await;
     match upload_status {
         Ok(val) => match val {
             Some(true) => Ok(HttpResponse::Ok()
