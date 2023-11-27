@@ -56,6 +56,14 @@ pub struct Args {
     // Remote port
     #[structopt(long = "remote_port")]
     pub remote_port: Option<String>,
+
+    //cert file
+    #[structopt(long = "cert_path")]
+    pub cert_path: Option<String>,
+
+    // key file
+    #[structopt(long = "key_path")]
+    pub key_path: Option<String>,
 }
 
 impl Args {

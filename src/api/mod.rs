@@ -1,16 +1,60 @@
 use crate::schema::GraphqlWebData;
 use crate::{schema, utils};
 use actix_multipart::Multipart;
-use actix_web::HttpResponse;
+use actix_web::{get, HttpResponse};
 use actix_web::{route, web, HttpRequest, Responder};
+use actix_web_lab::respond::Html;
+use juniper::http::graphiql::graphiql_source;
+use juniper::http::GraphQLRequest;
 use std::io::{Error, Read};
 use std::path::Path;
 
 mod util;
 use util::*;
 
+//graphql config
+/// GraphiQL playground UI
+#[get("/graphiql")]
+pub async fn graphql_playground() -> impl Responder {
+    Html(graphiql_source("/graphql", None))
+}
+
+/// GraphQL endpoint
+#[route("/graphql", method = "GET", method = "POST")]
+pub async fn graphql(
+    st: web::Data<GraphqlWebData>,
+    data: web::Json<GraphQLRequest>,
+    req: HttpRequest,
+) -> impl Responder {
+    let token = req.headers().get("authorization");
+
+    match token {
+        Some(token_value) => {
+            //use ssh connection in context
+            let ctx = schema::Context {
+                sess: st.sess.clone(),
+                //set auth token to context
+                auth_token: Some(token_value.to_str().unwrap().to_string()),
+                args: st.args.clone(),
+            };
+            let value = data.execute(&st.schema, &ctx).await;
+            HttpResponse::Ok().json(value)
+        }
+        None => {
+            //use ssh connection in context
+            let ctx = schema::Context {
+                sess: st.sess.clone(),
+                auth_token: None,
+                args: st.args.clone(),
+            };
+            let value = data.execute(&st.schema, &ctx).await;
+            HttpResponse::Ok().json(value)
+        }
+    }
+}
+
 #[route("/get_local_file", method = "GET")]
-async fn read_file(
+pub async fn read_file(
     req: HttpRequest,
     // Read file path
     info: web::Query<schema::PathQuery>,
