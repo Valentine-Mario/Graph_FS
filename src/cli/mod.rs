@@ -100,8 +100,10 @@ impl Args {
 #[derive(Debug, Clone)]
 pub enum UserConfig {
     AddUser,
-    UpdateUser,
+    UpdateUserName,
     DeleteUser,
+    UpdateUserPermission,
+    UpdateUserPassword,
 }
 
 #[derive(Debug, Clone)]
@@ -132,8 +134,10 @@ impl FromStr for UserConfig {
     fn from_str(types: &str) -> Result<Self, Self::Err> {
         match types {
             "add_user" => Ok(Self::AddUser),
-            "update_user" => Ok(Self::UpdateUser),
+            "update_username" => Ok(Self::UpdateUserName),
             "delete_user" => Ok(Self::DeleteUser),
+            "update_user_password" => Ok(Self::UpdateUserPassword),
+            "update_user_permission" => Ok(Self::UpdateUserPermission),
             _ => Err("could not parse user config"),
         }
     }

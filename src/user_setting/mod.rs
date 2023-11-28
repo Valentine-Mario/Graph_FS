@@ -9,7 +9,9 @@ pub fn manage_update(args: &Args) -> Result<(), Error> {
         Some(options) => match options {
             AddUser => Ok(()),
             DeleteUser => Ok(()),
-            UpdateUser => Ok(()),
+            UpdateUserName => Ok(()),
+            UpdateUserPassword => Ok(()),
+            UpdateUserPermission => Ok(()),
         },
         None => Err(Error::new(
             ErrorKind::InvalidData,
