@@ -1,5 +1,5 @@
 use crate::cli::Args;
-use std::io::Error;
+use std::io::{Error, ErrorKind};
 
 pub mod manage_config;
 
@@ -12,7 +12,7 @@ pub fn manage_update(args: &Args) -> Result<(), Error> {
             UpdateUser => Ok(()),
         },
         None => Err(Error::new(
-            std::io::ErrorKind::InvalidData,
+            ErrorKind::InvalidData,
             "No manmagement user option provided",
         )),
     }

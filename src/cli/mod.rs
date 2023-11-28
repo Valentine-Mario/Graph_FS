@@ -85,6 +85,10 @@ pub struct Args {
     //new name for when name is updated
     #[structopt(long = "new_acc_name")]
     pub new_account_name: Option<String>,
+
+    //jwt secret
+    #[structopt(long = "secret")]
+    pub jwt_secret: Option<String>,
 }
 
 impl Args {
