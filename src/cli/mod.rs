@@ -1,21 +1,22 @@
 use std::str::FromStr;
 
 use structopt::StructOpt;
+type ParseError = &'static str;
 
 #[derive(Debug, StructOpt, Clone)]
 #[structopt(name = "GraphFS ", about = "GraphFS tool")]
 pub struct Args {
     // Select host
     #[structopt(short = "h", long = "host")]
-    pub host: String,
+    pub host: Option<String>,
 
     // Select port
     #[structopt(short = "p", long = "port")]
-    pub port: u16,
+    pub port: Option<u16>,
 
     // Authorized path
     #[structopt(long = "auth_path")]
-    pub authorized_path: String,
+    pub authorized_path: Option<String>,
 
     // Define workers
     #[structopt[short = "w", long = "worker"]]
@@ -64,12 +65,39 @@ pub struct Args {
     // key file
     #[structopt(long = "key_path")]
     pub key_path: Option<String>,
+
+    // manage users
+    #[structopt(long = "manage_users")]
+    pub manage_users: Option<UserConfig>,
+
+    //name for new user
+    #[structopt(long = "acc_name")]
+    pub account_name: Option<String>,
+
+    //password for user
+    #[structopt(long = "acc_password")]
+    pub account_password: Option<String>,
+
+    //account permission
+    #[structopt(long = "acc_permission")]
+    pub account_permission: Option<String>,
+
+    //new name for when name is updated
+    #[structopt(long = "new_acc_name")]
+    pub new_account_name: Option<String>,
 }
 
 impl Args {
     pub fn new() -> Self {
         Args::from_args()
     }
+}
+
+#[derive(Debug, Clone)]
+pub enum UserConfig {
+    AddUser,
+    UpdateUser,
+    DeleteUser,
 }
 
 #[derive(Debug, Clone)]
@@ -83,8 +111,6 @@ pub enum AuthOption {
     UserauthPubkeyFile,
 }
 
-type ParseError = &'static str;
-
 impl FromStr for AuthOption {
     type Err = ParseError;
     fn from_str(types: &str) -> Result<Self, Self::Err> {
@@ -93,6 +119,18 @@ impl FromStr for AuthOption {
             "user_agent" => Ok(Self::UserauthAgent),
             "user_pub_key" => Ok(Self::UserauthPubkeyFile),
             _ => Err("Could not parse auth type"),
+        }
+    }
+}
+
+impl FromStr for UserConfig {
+    type Err = ParseError;
+    fn from_str(types: &str) -> Result<Self, Self::Err> {
+        match types {
+            "add_user" => Ok(Self::AddUser),
+            "update_user" => Ok(Self::UpdateUser),
+            "delete_user" => Ok(Self::DeleteUser),
+            _ => Err("could not parse user config"),
         }
     }
 }

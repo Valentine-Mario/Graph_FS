@@ -4,7 +4,10 @@ use std::{fmt, io::Error, io::ErrorKind, path::Path};
 
 pub fn check_auth_path(child: &Path) -> Result<bool, Error> {
     let args = crate::cli::Args::new();
-    let parent = Path::new(&args.authorized_path);
+    let path = &args
+        .authorized_path
+        .expect("please specify authorized path");
+    let parent = Path::new(path);
     if child.starts_with(parent) {
         return Ok(true);
     } else {

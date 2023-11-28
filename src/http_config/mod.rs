@@ -32,7 +32,7 @@ pub async fn local_server(args: Args) -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
     })
     .workers(arg.worker.unwrap_or(2))
-    .bind((arg.host, arg.port))?
+    .bind((arg.host.unwrap(), arg.port.unwrap()))?
     .run()
     .await
 }
@@ -62,15 +62,16 @@ pub async fn remote_server(args: Args) -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
     })
     .workers(arg.worker.unwrap_or(2))
-    .bind((arg.host, arg.port))?
+    .bind((arg.host.unwrap(), arg.port.unwrap()))?
     .run()
     .await
 }
 
 pub async fn local_server_ssl(args: Args) -> std::io::Result<()> {
     let arg = args.clone();
-    let addr = format!("{}:{}", args.host, args.port);
-    let ssl_builder = ssl_builder(args.clone()).expect("error build ssl connection");
+    let ssl_builder = ssl_builder(&args).expect("error build ssl connection");
+
+    let addr = format!("{}:{}", &arg.host.unwrap(), &arg.port.unwrap());
 
     HttpServer::new(move || {
         //contains only schema
@@ -97,8 +98,9 @@ pub async fn local_server_ssl(args: Args) -> std::io::Result<()> {
 
 pub async fn remote_server_ssl(args: Args) -> std::io::Result<()> {
     let arg = args.clone();
-    let addr = format!("{}:{}", args.host, args.port);
-    let ssl_builder = ssl_builder(args.clone()).expect("error build ssl connection");
+    let ssl_builder = ssl_builder(&args).expect("error build ssl connection");
+
+    let addr = format!("{}:{}", &arg.host.unwrap(), &arg.port.unwrap());
 
     HttpServer::new(move || {
         let mut sess: Session = Session::new().expect("Failed to connect to SSH");
@@ -125,9 +127,9 @@ pub async fn remote_server_ssl(args: Args) -> std::io::Result<()> {
     .await
 }
 
-fn ssl_builder(arg: Args) -> std::io::Result<SslAcceptorBuilder> {
+fn ssl_builder(arg: &Args) -> std::io::Result<SslAcceptorBuilder> {
     let mut ssl_builder = SslAcceptor::mozilla_intermediate(SslMethod::tls())?;
-    ssl_builder.set_private_key_file(&arg.key_path.unwrap(), SslFiletype::PEM)?;
-    ssl_builder.set_certificate_chain_file(&arg.cert_path.unwrap())?;
+    ssl_builder.set_private_key_file(&arg.clone().key_path.unwrap(), SslFiletype::PEM)?;
+    ssl_builder.set_certificate_chain_file(&arg.clone().cert_path.unwrap())?;
     Ok(ssl_builder)
 }
