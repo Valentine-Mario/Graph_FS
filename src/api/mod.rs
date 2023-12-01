@@ -1,8 +1,8 @@
 use crate::schema::GraphqlWebData;
 use crate::{schema, utils};
 use actix_multipart::Multipart;
-use actix_web::{get, HttpResponse};
-use actix_web::{route, web, HttpRequest, Responder};
+use actix_web::HttpResponse;
+use actix_web::{web, HttpRequest, Responder};
 use actix_web_lab::respond::Html;
 use juniper::http::graphiql::graphiql_source;
 use juniper::http::GraphQLRequest;
@@ -14,13 +14,11 @@ use util::*;
 
 //graphql config
 /// GraphiQL playground UI
-#[get("/graphiql")]
 pub async fn graphql_playground() -> impl Responder {
     Html(graphiql_source("/graphql", None))
 }
 
 /// GraphQL endpoint
-#[route("/graphql", method = "GET", method = "POST")]
 pub async fn graphql(
     st: web::Data<GraphqlWebData>,
     data: web::Json<GraphQLRequest>,
@@ -53,7 +51,6 @@ pub async fn graphql(
     }
 }
 
-#[route("/get_local_file", method = "GET")]
 pub async fn read_file(
     req: HttpRequest,
     // Read file path
@@ -65,7 +62,6 @@ pub async fn read_file(
     Ok(file.into_response(&req))
 }
 
-#[route("/add_local_file", method = "POST")]
 pub async fn upload(
     payload: Multipart,
     // Directory you want to add file
@@ -89,7 +85,6 @@ pub async fn upload(
     }
 }
 
-#[route("/get_remote_file", method = "GET")]
 pub async fn read_remote_file(
     sess: web::Data<GraphqlWebData>,
     info: web::Query<schema::PathQuery>,
@@ -105,7 +100,6 @@ pub async fn read_remote_file(
     Ok(buffer_response(contents))
 }
 
-#[route("/add_remote_file", method = "POST")]
 pub async fn upload_remote_file(
     sess: web::Data<GraphqlWebData>,
     payload: Multipart,

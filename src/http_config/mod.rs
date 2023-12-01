@@ -1,16 +1,37 @@
 use std::sync::Arc;
 
-use actix_cors::Cors;
-use actix_web::{middleware, web::Data, App, HttpServer};
-use openssl::ssl::{SslAcceptor, SslAcceptorBuilder, SslFiletype, SslMethod};
-use ssh2::Session;
-
 use crate::{
     api::{self, graphql, graphql_playground},
     cli::Args,
     fs_module,
     schema::{create_schema, GraphqlWebData},
 };
+use actix_cors::Cors;
+use actix_web::{middleware, web, web::Data, App, HttpServer};
+use openssl::ssl::{SslAcceptor, SslAcceptorBuilder, SslFiletype, SslMethod};
+use ssh2::Session;
+
+fn local_fs_routes(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("")
+            .route("/graphql", web::get().to(graphql))
+            .route("/graphiql", web::get().to(graphql_playground))
+            .route("/get_local_file", web::get().to(api::read_file))
+            .route("/add_local_file", web::post().to(api::upload)),
+    );
+}
+
+fn remote_fs_routes(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("")
+            .route("/graphql", web::get().to(graphql))
+            .route("/graphiql", web::get().to(graphql_playground))
+            .route("/get_local_file", web::get().to(api::read_file))
+            .route("/add_local_file", web::post().to(api::upload))
+            .route("/add_remote_file", web::post().to(api::upload_remote_file))
+            .route("/get_remote_file", web::get().to(api::read_remote_file)),
+    );
+}
 
 pub async fn local_server(args: Args) -> std::io::Result<()> {
     let arg = args.clone();
@@ -23,10 +44,7 @@ pub async fn local_server(args: Args) -> std::io::Result<()> {
         });
         App::new()
             .app_data(Data::from(local_data))
-            .service(graphql)
-            .service(graphql_playground)
-            .service(api::read_file)
-            .service(api::upload)
+            .configure(local_fs_routes)
             // The GraphiQL UI requires CORS to be enabled
             .wrap(Cors::permissive())
             .wrap(middleware::Logger::default())
@@ -51,12 +69,7 @@ pub async fn remote_server(args: Args) -> std::io::Result<()> {
         });
         App::new()
             .app_data(Data::from(remote_data))
-            .service(graphql)
-            .service(graphql_playground)
-            .service(api::read_remote_file)
-            .service(api::upload_remote_file)
-            .service(api::read_file)
-            .service(api::upload)
+            .configure(remote_fs_routes)
             // The GraphiQL UI requires CORS to be enabled
             .wrap(Cors::permissive())
             .wrap(middleware::Logger::default())
@@ -82,10 +95,7 @@ pub async fn local_server_ssl(args: Args) -> std::io::Result<()> {
         });
         App::new()
             .app_data(Data::from(local_data))
-            .service(graphql)
-            .service(graphql_playground)
-            .service(api::read_file)
-            .service(api::upload)
+            .configure(local_fs_routes)
             // The GraphiQL UI requires CORS to be enabled
             .wrap(Cors::permissive())
             .wrap(middleware::Logger::default())
@@ -113,10 +123,7 @@ pub async fn remote_server_ssl(args: Args) -> std::io::Result<()> {
         });
         App::new()
             .app_data(Data::from(remote_data))
-            .service(graphql)
-            .service(graphql_playground)
-            .service(api::read_file)
-            .service(api::upload)
+            .configure(remote_fs_routes)
             // The GraphiQL UI requires CORS to be enabled
             .wrap(Cors::permissive())
             .wrap(middleware::Logger::default())

@@ -1,5 +1,5 @@
 use std::{io::Error, io::ErrorKind, path::Path};
-use toml::Table;
+use toml::{Table, Value};
 use toml_edit::{value, Document};
 
 use crate::{auth::bcrypt_util::encrypt_password, cli::Args};
@@ -164,6 +164,19 @@ pub fn edit_user_acc_priviledge(args: &Args) -> Result<(), Error> {
             }
             Ok(())
         }
+        Err(_) => Err(Error::new(ErrorKind::InvalidData, "Invalid config file")),
+    }
+}
+
+pub fn get_user(user: &str) -> Result<Value, Error> {
+    //parse raw toml config
+    let data = read_config_file().unwrap();
+    let raw_cfg = &data.parse::<Table>();
+    match raw_cfg {
+        Ok(data) => match data.get(user) {
+            Some(user) => Ok(user.clone()),
+            None => Err(Error::new(ErrorKind::NotFound, "User not found")),
+        },
         Err(_) => Err(Error::new(ErrorKind::InvalidData, "Invalid config file")),
     }
 }

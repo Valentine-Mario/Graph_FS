@@ -47,7 +47,7 @@ async fn main() -> std::io::Result<()> {
         }
     } else {
         //manage account here
-        user_setting::manage_update(&args).expect("error");
+        user_setting::manage_update(&args).unwrap();
         Ok(())
     }
 }
