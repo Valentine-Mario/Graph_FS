@@ -15,42 +15,41 @@ async fn main() -> std::io::Result<()> {
 
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
     let args = cli::Args::new();
-    user_setting::manage_config::delete_user(args.clone());
 
-    // if args.manage_users.is_none() {
-    //     let a = args.clone();
-    //     //it is safe to unwrap because the user has entered graphQL mode here
-    //     log::info!("Starting HTTP server on port {}", a.port.unwrap());
-    //     log::info!(
-    //         "GraphiQL playground: http://{}:{}/graphiql",
-    //         a.host.unwrap(),
-    //         a.port.unwrap()
-    //     );
+    if args.manage_users.is_none() {
+        let a = args.clone();
+        //it is safe to unwrap because the user has entered graphQL mode here
+        log::info!("Starting HTTP server on port {}", a.port.unwrap());
+        log::info!(
+            "GraphiQL playground: http://{}:{}/graphiql",
+            a.host.unwrap(),
+            a.port.unwrap()
+        );
 
-    //     if args.key_path.is_some() && args.cert_path.is_some() {
-    //         // Handle remote FS http server
-    //         if args.remote.is_some() && args.remote.unwrap() {
-    //             // Start remote HTTP server
-    //             http_config::remote_server_ssl(args).await
-    //         } else {
-    //             // Start local FS HTTP server
-    //             http_config::local_server_ssl(args).await
-    //         }
-    //     } else {
-    //         // Handle remote FS http server
-    //         if args.remote.is_some() && args.remote.unwrap() {
-    //             // Start remote HTTP server
-    //             http_config::remote_server(args).await
-    //         } else {
-    //             // Start local FS HTTP server
-    //             http_config::local_server(args).await
-    //         }
-    //     }
-    // } else {
-    //     //manage account here
-    //     Ok(())
-    // }
-    Ok(())
+        if args.key_path.is_some() && args.cert_path.is_some() {
+            // Handle remote FS http server
+            if args.remote.is_some() && args.remote.unwrap() {
+                // Start remote HTTP server
+                http_config::remote_server_ssl(args).await
+            } else {
+                // Start local FS HTTP server
+                http_config::local_server_ssl(args).await
+            }
+        } else {
+            // Handle remote FS http server
+            if args.remote.is_some() && args.remote.unwrap() {
+                // Start remote HTTP server
+                http_config::remote_server(args).await
+            } else {
+                // Start local FS HTTP server
+                http_config::local_server(args).await
+            }
+        }
+    } else {
+        //manage account here
+        user_setting::manage_update(&args).expect("error");
+        Ok(())
+    }
 }
 //./target/debug/graph_fs -p 8000 -h 127.0.0.1 --auth_path /home/dead/Documents
 //remote
