@@ -66,6 +66,10 @@ pub struct Args {
     #[structopt(long = "key_path")]
     pub key_path: Option<String>,
 
+    //use auth feature
+    #[structopt(long = "use_auth")]
+    pub use_auth: Option<bool>,
+
     // manage users
     #[structopt(long = "manage_users")]
     pub manage_users: Option<UserConfig>,

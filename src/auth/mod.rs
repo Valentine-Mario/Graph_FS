@@ -3,6 +3,7 @@ use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 
 use crate::cli::Args;
+pub mod bcrypt_util;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Claims {

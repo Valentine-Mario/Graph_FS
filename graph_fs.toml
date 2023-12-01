@@ -1,0 +1,2 @@
+paul = { name = "paul", password = "$2b$08$NmCOixtzQmZIzp37vVEL1ujheWIcNsTwCKABuUcwJ2uYhuuT8fmZm" }
+vincent = { name = "vincent", password = "$2b$08$JTuSn5hJTECgXMgtW0cpYeGJSUW92bvXmGzkkMhAo8Ifi.EQ1pbWO", permission = "read,write" }
