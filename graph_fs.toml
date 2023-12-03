@@ -2,3 +2,4 @@ vincent = { name = "vincent", password = "$2b$08$JTuSn5hJTECgXMgtW0cpYeGJSUW92bv
 king = { name = "king", password = "$2b$08$NmCOixtzQmZIzp37vVEL1ujheWIcNsTwCKABuUcwJ2uYhuuT8fmZm" }
 sola = { name = "sola", password = "$2b$08$NmCOixtzQmZIzp37vVEL1ujheWIcNsTwCKABuUcwJ2uYhuuT8fmZm" }
 zik = { name = "zik", password = "$2b$08$ASYscjqxnEUU4o/ToZWX/uOHLCpYKlxuoNn9BXxRn6Zk6bj6WufOy" }
+
