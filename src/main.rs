@@ -16,6 +16,10 @@ async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
     let args = cli::Args::new();
 
+    if args.use_auth.is_some() && args.jwt_secret.is_none() {
+        panic!("provide jwt secret when in auth mode")
+    }
+
     if args.manage_users.is_none() {
         let a = args.clone();
         //it is safe to unwrap because the user has entered graphQL mode here

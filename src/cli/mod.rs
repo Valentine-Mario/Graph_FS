@@ -93,6 +93,10 @@ pub struct Args {
     //jwt secret
     #[structopt(long = "secret")]
     pub jwt_secret: Option<String>,
+
+    //jwt duration
+    #[structopt(long = "jwt_duration")]
+    pub jwt_duration: Option<i64>,
 }
 
 impl Args {

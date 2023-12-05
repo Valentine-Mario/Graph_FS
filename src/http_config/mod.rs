@@ -17,7 +17,8 @@ fn local_fs_routes(cfg: &mut web::ServiceConfig) {
             .service(api::graphql::graphql)
             .route("/graphiql", web::get().to(api::graphql::graphql_playground))
             .route("/get_local_file", web::get().to(api::file_op::read_file))
-            .route("/add_local_file", web::post().to(api::file_op::upload)),
+            .route("/add_local_file", web::post().to(api::file_op::upload))
+            .route("/login", web::post().to(api::login::login)),
     );
 }
 
@@ -35,7 +36,8 @@ fn remote_fs_routes(cfg: &mut web::ServiceConfig) {
             .route(
                 "/get_remote_file",
                 web::get().to(api::file_op::read_remote_file),
-            ),
+            )
+            .route("/login", web::post().to(api::login::login)),
     );
 }
 

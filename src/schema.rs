@@ -2,9 +2,9 @@ use std::pin::Pin;
 
 use juniper::futures::Stream;
 use juniper::Context as JuniperContext;
+use juniper::GraphQLObject;
 use juniper::{futures, graphql_subscription, RootNode};
-use juniper::{GraphQLEnum, GraphQLObject};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use ssh2::Session;
 
 use crate::cli::Args;
@@ -19,13 +19,6 @@ pub enum MySshFileType {
     Symlink,
     Socket,
     Other,
-}
-
-#[derive(GraphQLEnum)]
-pub enum Episode {
-    NewHope,
-    Empire,
-    Jedi,
 }
 
 impl JuniperContext for Context {}
@@ -46,6 +39,12 @@ pub struct Folder {
     pub name: String,
     pub content_length: i32,
     pub parent_folder: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct LoginUser {
+    pub name: String,
+    pub password: String,
 }
 
 #[derive(Deserialize)]

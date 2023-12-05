@@ -58,7 +58,11 @@ pub fn validate_token(token: &String, args: Args) -> Result<bool, Box<dyn std::e
 pub fn decode_token(token: &String, args: Args) -> String {
     let token_data = jsonwebtoken::decode::<Claims>(
         &token,
-        &DecodingKey::from_secret(args.jwt_secret.unwrap().as_bytes()),
+        &DecodingKey::from_secret(
+            args.jwt_secret
+                .unwrap_or(String::from("default"))
+                .as_bytes(),
+        ),
         &Validation::default(),
     )
     .unwrap();
@@ -79,7 +83,11 @@ pub fn create_token(
     let token = jsonwebtoken::encode(
         &Header::default(),
         &claims,
-        &EncodingKey::from_secret(args.jwt_secret.unwrap().as_bytes()),
+        &EncodingKey::from_secret(
+            args.jwt_secret
+                .unwrap_or(String::from("default"))
+                .as_bytes(),
+        ),
     )?;
 
     Ok(token)
