@@ -1,6 +1,6 @@
 use crate::{
     auth::{bcrypt_util::compare_password, jwt::create_token},
-    schema::{GraphqlWebData, LoginUser},
+    schema::{GraphqlWebData, JsonRes, LoginUser},
     user_setting::manage_config::get_user,
 };
 use actix_web::{web, HttpResponse};
@@ -18,7 +18,7 @@ pub async fn login(
                         if verify {
                             let duration = st.args.jwt_duration.unwrap_or(30);
                             if let Ok(token) = create_token(&data.name, duration, st.args.clone()) {
-                                Ok(HttpResponse::Ok().content_type("text/plain").body(token))
+                                Ok(HttpResponse::Ok().json(JsonRes { data: token }))
                             } else {
                                 Ok(HttpResponse::Forbidden()
                                     .content_type("text/plain")

@@ -47,6 +47,11 @@ pub struct LoginUser {
     pub password: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct JsonRes {
+    pub data: String,
+}
+
 #[derive(Deserialize)]
 pub struct PathQuery {
     pub path: String,
