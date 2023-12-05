@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
-    api::{self, graphql, graphql_playground},
+    api::{self},
     cli::Args,
     fs_module,
     schema::{create_schema, GraphqlWebData},
@@ -14,22 +14,28 @@ use ssh2::Session;
 fn local_fs_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("")
-            .route("/graphql", web::get().to(graphql))
-            .route("/graphiql", web::get().to(graphql_playground))
-            .route("/get_local_file", web::get().to(api::read_file))
-            .route("/add_local_file", web::post().to(api::upload)),
+            .service(api::graphql::graphql)
+            .route("/graphiql", web::get().to(api::graphql::graphql_playground))
+            .route("/get_local_file", web::get().to(api::file_op::read_file))
+            .route("/add_local_file", web::post().to(api::file_op::upload)),
     );
 }
 
 fn remote_fs_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("")
-            .route("/graphql", web::get().to(graphql))
-            .route("/graphiql", web::get().to(graphql_playground))
-            .route("/get_local_file", web::get().to(api::read_file))
-            .route("/add_local_file", web::post().to(api::upload))
-            .route("/add_remote_file", web::post().to(api::upload_remote_file))
-            .route("/get_remote_file", web::get().to(api::read_remote_file)),
+            .service(api::graphql::graphql)
+            .route("/graphiql", web::get().to(api::graphql::graphql_playground))
+            .route("/get_local_file", web::get().to(api::file_op::read_file))
+            .route("/add_local_file", web::post().to(api::file_op::upload))
+            .route(
+                "/add_remote_file",
+                web::post().to(api::file_op::upload_remote_file),
+            )
+            .route(
+                "/get_remote_file",
+                web::get().to(api::file_op::read_remote_file),
+            ),
     );
 }
 
