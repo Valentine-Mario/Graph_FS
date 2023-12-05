@@ -5,7 +5,9 @@ use actix_web::error::ErrorUnauthorized;
 use actix_web::{Error, FromRequest, HttpRequest};
 use futures::Future;
 
+use crate::auth::jwt;
 use crate::cli::Args;
+use crate::user_setting::manage_config::get_user;
 
 pub struct Authorized;
 
@@ -31,10 +33,16 @@ fn is_authorized(req: &HttpRequest) -> bool {
 
     if args.use_auth.is_some() && args.use_auth.unwrap() {
         if let Some(value) = req.headers().get("authorized") {
-            println!("token {:?}", value);
-            true
+            if let Ok(user) = jwt::decode_token(&value.to_str().unwrap().to_string(), args) {
+                if let Ok(_) = get_user(&user) {
+                    true
+                } else {
+                    false
+                }
+            } else {
+                false
+            }
         } else {
-            println!("unauthorized");
             false
         }
     } else {
