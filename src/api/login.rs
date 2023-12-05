@@ -20,25 +20,25 @@ pub async fn login(
                             if let Ok(token) = create_token(&data.name, duration, st.args.clone()) {
                                 Ok(HttpResponse::Ok().json(JsonRes { data: token }))
                             } else {
-                                Ok(HttpResponse::Forbidden()
+                                Ok(HttpResponse::BadGateway()
                                     .content_type("text/plain")
                                     .body("Error creating token"))
                             }
                         } else {
-                            Ok(HttpResponse::Forbidden()
+                            Ok(HttpResponse::Unauthorized()
                                 .content_type("text/plain")
                                 .body("Invalid password"))
                         }
                     }
                     Err(e) => {
                         let body = format!("{:?}", e);
-                        Ok(HttpResponse::Forbidden()
+                        Ok(HttpResponse::BadGateway()
                             .content_type("text/plain")
                             .body(body))
                     }
                 }
             }
-            None => Ok(HttpResponse::Forbidden()
+            None => Ok(HttpResponse::Unauthorized()
                 .content_type("text/plain")
                 .body("invalid password")),
         },
