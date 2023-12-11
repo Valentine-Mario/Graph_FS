@@ -29,7 +29,7 @@ pub async fn graphql(
             let ctx = schema::Context {
                 sess: st.sess.clone(),
                 //set auth token to context
-                auth_token: Some(token_value.to_str().unwrap().to_string()),
+                auth_token: Some(token_value.to_str().unwrap_or("").to_string()),
                 args: st.args.clone(),
             };
             let value = data.execute(&st.schema, &ctx).await;
