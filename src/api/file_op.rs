@@ -1,4 +1,5 @@
 use super::util::*;
+use crate::auth::check_access::Authorized;
 use crate::schema::GraphqlWebData;
 use crate::{schema, utils};
 use actix_multipart::Multipart;
@@ -11,6 +12,7 @@ pub async fn read_file(
     req: HttpRequest,
     // Read file path
     info: web::Query<schema::PathQuery>,
+    _: Authorized,
 ) -> Result<impl Responder, Error> {
     let file_path = std::path::Path::new(&info.path);
     utils::check_auth_path(file_path)?;
@@ -22,6 +24,7 @@ pub async fn upload(
     payload: Multipart,
     // Directory you want to add file
     info: web::Query<schema::PathQuery>,
+    _: Authorized,
 ) -> Result<HttpResponse, Error> {
     let file_path = std::path::Path::new(&info.path);
     utils::check_auth_path(file_path)?;
@@ -44,6 +47,7 @@ pub async fn upload(
 pub async fn read_remote_file(
     sess: web::Data<GraphqlWebData>,
     info: web::Query<schema::PathQuery>,
+    _: Authorized,
 ) -> Result<HttpResponse, Error> {
     let (mut remote_file, _) = sess
         .sess
@@ -61,6 +65,7 @@ pub async fn upload_remote_file(
     payload: Multipart,
     // Directory you want to add file
     info: web::Query<schema::PathQuery>,
+    _: Authorized,
 ) -> Result<HttpResponse, Error> {
     let file_path = std::path::Path::new(&info.path);
     utils::check_auth_path(file_path)?;

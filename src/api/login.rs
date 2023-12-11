@@ -17,7 +17,9 @@ pub async fn login(
                     Ok(verify) => {
                         if verify {
                             let duration = st.args.jwt_duration.unwrap_or(30);
-                            if let Ok(token) = create_token(&data.name, duration, st.args.clone()) {
+                            if let Ok(token) =
+                                create_token(&data.name, duration, st.args.clone().jwt_secret)
+                            {
                                 Ok(HttpResponse::Ok().json(JsonRes { data: token }))
                             } else {
                                 Ok(HttpResponse::BadGateway()
