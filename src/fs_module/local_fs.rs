@@ -1,6 +1,6 @@
 use super::utils::{get_file_list, get_folder_list};
 use crate::{
-    fs_module::handler::graphql_write_access,
+    fs_module::graphql_write_access,
     schema::{Context, File, Folder, Message},
     utils::check_auth_path,
 };

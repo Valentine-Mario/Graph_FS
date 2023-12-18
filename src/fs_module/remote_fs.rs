@@ -4,7 +4,7 @@ use juniper::FieldResult;
 
 use crate::{
     fs_module::{
-        handler::graphql_write_access,
+        graphql_write_access,
         utils::{get_remote_file_list, get_remote_folder_list},
     },
     schema::{Context, File, Folder, Message},
