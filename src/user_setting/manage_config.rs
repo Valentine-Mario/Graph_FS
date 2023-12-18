@@ -169,6 +169,7 @@ pub fn edit_user_acc_priviledge(args: &Args) -> Result<(), Error> {
 }
 
 pub fn get_user(user: &str) -> Result<Value, Error> {
+    check_for_config();
     //parse raw toml config
     let data = read_config_file().unwrap();
     let raw_cfg = &data.parse::<Table>();
