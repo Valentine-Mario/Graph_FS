@@ -1,5 +1,6 @@
 use super::utils::{get_file_list, get_folder_list};
 use crate::{
+    fs_module::handler::graphql_write_access,
     schema::{Context, File, Folder, Message},
     utils::check_auth_path,
 };
@@ -40,7 +41,12 @@ pub struct LocalFsMutation;
 #[juniper::graphql_object(context = Context)]
 impl LocalFsMutation {
     #[graphql(description = "This mutation can be used to rename files or folders")]
-    fn rename_item(from: String, to: String) -> FieldResult<Message> {
+    fn rename_item(context: &Context, from: String, to: String) -> FieldResult<Message> {
+        if !graphql_write_access(context) {
+            return Ok(Message::new(String::from(
+                "Unauthorized to perform write operation",
+            )));
+        }
         let from_path = Path::new(&from);
         check_auth_path(&from_path)?;
 
@@ -51,7 +57,12 @@ impl LocalFsMutation {
     }
 
     #[graphql(description = "This mutation is used for moving file(s) or folder(s)")]
-    fn move_item(from: Vec<String>, to: String) -> FieldResult<Message> {
+    fn move_item(context: &Context, from: Vec<String>, to: String) -> FieldResult<Message> {
+        if !graphql_write_access(context) {
+            return Ok(Message::new(String::from(
+                "Unauthorized to perform write operation",
+            )));
+        }
         let to_path = Path::new(&to);
         check_auth_path(&to_path)?;
         // Check if all from destination is permitted diurectory
@@ -64,7 +75,12 @@ impl LocalFsMutation {
     }
 
     #[graphql(description = "This mutation is to copy an item or group of items")]
-    fn copy_item(from: Vec<String>, to: String) -> FieldResult<Message> {
+    fn copy_item(context: &Context, from: Vec<String>, to: String) -> FieldResult<Message> {
+        if !graphql_write_access(context) {
+            return Ok(Message::new(String::from(
+                "Unauthorized to perform write operation",
+            )));
+        }
         let to_path = Path::new(&to);
         check_auth_path(&to_path)?;
         // Check if all from destination is permitted diurectory
@@ -77,7 +93,12 @@ impl LocalFsMutation {
     }
 
     #[graphql(description = "Delete directory")]
-    fn delete_dir(path: String) -> FieldResult<Message> {
+    fn delete_dir(context: &Context, path: String) -> FieldResult<Message> {
+        if !graphql_write_access(context) {
+            return Ok(Message::new(String::from(
+                "Unauthorized to perform write operation",
+            )));
+        }
         let path = Path::new(&path);
         check_auth_path(&path)?;
         fs::remove_dir_all(path)?;
@@ -85,7 +106,12 @@ impl LocalFsMutation {
     }
 
     #[graphql(description = "Delete file")]
-    fn delete_file(path: String) -> FieldResult<Message> {
+    fn delete_file(context: &Context, path: String) -> FieldResult<Message> {
+        if !graphql_write_access(context) {
+            return Ok(Message::new(String::from(
+                "Unauthorized to perform write operation",
+            )));
+        }
         let path = Path::new(&path);
         check_auth_path(&path)?;
         fs::remove_file(path)?;
@@ -93,7 +119,12 @@ impl LocalFsMutation {
     }
 
     #[graphql(description = "Create directory")]
-    fn create_dir(path: String) -> FieldResult<Message> {
+    fn create_dir(context: &Context, path: String) -> FieldResult<Message> {
+        if !graphql_write_access(context) {
+            return Ok(Message::new(String::from(
+                "Unauthorized to perform write operation",
+            )));
+        }
         let path = Path::new(&path);
         check_auth_path(&path)?;
         fs::create_dir_all(path)?;
@@ -101,7 +132,12 @@ impl LocalFsMutation {
     }
 
     #[graphql(description = "Create file")]
-    fn create_file(path: String) -> FieldResult<Message> {
+    fn create_file(context: &Context, path: String) -> FieldResult<Message> {
+        if !graphql_write_access(context) {
+            return Ok(Message::new(String::from(
+                "Unauthorized to perform write operation",
+            )));
+        }
         let path = Path::new(&path);
         check_auth_path(&path)?;
         RFile::create(path)?;
@@ -111,7 +147,17 @@ impl LocalFsMutation {
     #[graphql(
         description = "Update a file content at a seek position. For large file, use the upload endpoint. Payload should be in base64 encoding"
     )]
-    fn update_file(path: String, seek: i32, payload: String) -> FieldResult<Message> {
+    fn update_file(
+        context: &Context,
+        path: String,
+        seek: i32,
+        payload: String,
+    ) -> FieldResult<Message> {
+        if !graphql_write_access(context) {
+            return Ok(Message::new(String::from(
+                "Unauthorized to perform write operation",
+            )));
+        }
         let path = Path::new(&path);
         check_auth_path(&path)?;
         let bytes = general_purpose::STANDARD.decode(payload)?;

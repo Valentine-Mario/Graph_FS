@@ -1,4 +1,7 @@
-use crate::schema::{Context, MutationRoot, QueryRoot};
+use crate::{
+    auth::check_access::check_write_access,
+    schema::{Context, MutationRoot, QueryRoot},
+};
 
 #[juniper::graphql_object(context = Context)]
 impl QueryRoot {
@@ -20,4 +23,12 @@ impl MutationRoot {
     fn remote_fs(&self) -> super::remote_fs::RemoteFsMutation {
         super::remote_fs::RemoteFsMutation
     }
+}
+
+pub fn graphql_write_access(context: &Context) -> bool {
+    if context.args.use_auth.is_some() && context.args.use_auth.unwrap() {
+        let token = context.clone().auth_token.unwrap_or("".to_string());
+        return check_write_access(context.args.clone(), &token);
+    }
+    return true;
 }

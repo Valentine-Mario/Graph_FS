@@ -60,6 +60,8 @@ pub fn check_write_access(args: Args, token: &String) -> bool {
                     Some(permission) => {
                         if permission.to_string().trim() == "read" {
                             return false;
+                        } else {
+                            return true;
                         }
                     }
                     None => return true,

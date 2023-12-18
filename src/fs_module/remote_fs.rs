@@ -3,7 +3,10 @@ use std::path::Path;
 use juniper::FieldResult;
 
 use crate::{
-    fs_module::utils::{get_remote_file_list, get_remote_folder_list},
+    fs_module::{
+        handler::graphql_write_access,
+        utils::{get_remote_file_list, get_remote_folder_list},
+    },
     schema::{Context, File, Folder, Message},
     utils::check_auth_path,
 };
@@ -34,6 +37,11 @@ pub struct RemoteFsMutation;
 impl RemoteFsMutation {
     #[graphql(description = "Create file")]
     fn create_file(context: &Context, path: String) -> FieldResult<Message> {
+        if !graphql_write_access(context) {
+            return Ok(Message::new(String::from(
+                "Unauthorized to perform write operation",
+            )));
+        }
         let path = Path::new(&path);
         check_auth_path(&path)?;
         let sftp = context.sess.as_ref().unwrap().sftp()?;
@@ -46,6 +54,11 @@ impl RemoteFsMutation {
         description = "Create directory. Set mode optionally, would default to allow user read and write without sudo"
     )]
     fn create_dir(context: &Context, path: String, mode: Option<i32>) -> FieldResult<Message> {
+        if !graphql_write_access(context) {
+            return Ok(Message::new(String::from(
+                "Unauthorized to perform write operation",
+            )));
+        }
         let path = Path::new(&path);
         check_auth_path(&path)?;
         let sftp = context.sess.as_ref().unwrap().sftp()?;
@@ -57,6 +70,11 @@ impl RemoteFsMutation {
 
     #[graphql(description = "Delete a file")]
     fn delete_file(context: &Context, path: String) -> FieldResult<Message> {
+        if !graphql_write_access(context) {
+            return Ok(Message::new(String::from(
+                "Unauthorized to perform write operation",
+            )));
+        }
         let path = Path::new(&path);
         check_auth_path(&path)?;
         let sftp = context.sess.as_ref().unwrap().sftp()?;
@@ -67,6 +85,11 @@ impl RemoteFsMutation {
 
     #[graphql(description = "Delete a folder")]
     fn delete_dir(context: &Context, path: String) -> FieldResult<Message> {
+        if !graphql_write_access(context) {
+            return Ok(Message::new(String::from(
+                "Unauthorized to perform write operation",
+            )));
+        }
         let path = Path::new(&path);
         check_auth_path(&path)?;
         let sftp = context.sess.as_ref().unwrap().sftp()?;
@@ -77,6 +100,11 @@ impl RemoteFsMutation {
 
     #[graphql(description = "Rename a file or folder, also used to move item")]
     fn rename_item(context: &Context, from: String, to: String) -> FieldResult<Message> {
+        if !graphql_write_access(context) {
+            return Ok(Message::new(String::from(
+                "Unauthorized to perform write operation",
+            )));
+        }
         let from_path = Path::new(&from);
         check_auth_path(&from_path)?;
 
