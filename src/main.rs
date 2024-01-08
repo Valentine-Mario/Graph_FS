@@ -17,7 +17,7 @@ async fn main() -> std::io::Result<()> {
     let args = cli::Args::new();
 
     if args.use_auth.is_some() && args.jwt_secret.is_none() {
-        panic!("provide jwt secret when in auth mode")
+        panic!("provide jwt secret when using auth mode")
     }
 
     if args.manage_users.is_none() {
@@ -51,7 +51,7 @@ async fn main() -> std::io::Result<()> {
         }
     } else {
         //manage account here
-        user_setting::manage_update(&args).unwrap();
+        user_setting::manage_update(&args)?;
         Ok(())
     }
 }
