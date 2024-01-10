@@ -21,7 +21,7 @@ pub async fn graphql(
     req: HttpRequest,
     _: Authorized,
 ) -> impl Responder {
-    let token = req.headers().get("authorized");
+    let token = req.headers().get("authorization");
 
     match token {
         Some(token_value) => {

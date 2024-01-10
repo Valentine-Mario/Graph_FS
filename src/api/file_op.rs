@@ -32,7 +32,7 @@ pub async fn upload(
     if st.args.use_auth.is_some() && st.args.use_auth.unwrap() {
         let token = req
             .headers()
-            .get("authorized")
+            .get("authorization")
             .unwrap_or(&HeaderValue::from(0))
             .to_str()
             .unwrap_or("")
@@ -90,7 +90,7 @@ pub async fn upload_remote_file(
     if st.args.use_auth.is_some() && st.args.use_auth.unwrap() {
         let token = req
             .headers()
-            .get("authorized")
+            .get("authorization")
             .unwrap_or(&HeaderValue::from(0))
             .to_str()
             .unwrap_or("")

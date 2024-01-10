@@ -32,7 +32,7 @@ fn is_authorized(req: &HttpRequest) -> bool {
     let args = Args::new();
 
     if args.use_auth.is_some() && args.use_auth.unwrap() {
-        if let Some(value) = req.headers().get("authorized") {
+        if let Some(value) = req.headers().get("authorization") {
             if let Ok(user) =
                 jwt::decode_token(&value.to_str().unwrap_or("").to_string(), args.jwt_secret)
             {
