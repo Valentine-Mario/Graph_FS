@@ -30,6 +30,10 @@ async fn main() -> std::io::Result<()> {
             a.port.unwrap()
         );
 
+        if a.authorized_path.is_none() {
+            panic!("You must specify an auth path for the server")
+        }
+
         if args.key_path.is_some() && args.cert_path.is_some() {
             // Handle remote FS http server
             if args.remote.is_some() && args.remote.unwrap() {

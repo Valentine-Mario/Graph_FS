@@ -1,2 +1,0 @@
-val = { name = "val", password = "$2b$08$6sNPWVfi32XwVxjnz79zmeK84VWbrtexSdm8vQPQi73OWM9/LBK7S" }
-Bola = { name = "Bola", password = "$2b$08$ALgH03L9hZmPNEfVmry1TudfEFuVumllyg.gywzjJl9evOLW8jBeq", permission = "read" }
