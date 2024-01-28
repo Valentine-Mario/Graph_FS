@@ -46,7 +46,7 @@ pub async fn upload(
 
     let file_path = std::path::Path::new(&info.path);
     utils::check_auth_path(file_path)?;
-    let upload_status = save_local_file(payload, &file_path).await;
+    let upload_status = save_local_file(payload, file_path).await;
     match upload_status {
         Ok(val) => match val {
             Some(true) => Ok(HttpResponse::Ok()
