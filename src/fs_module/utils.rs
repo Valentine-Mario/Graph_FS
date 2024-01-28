@@ -19,7 +19,6 @@ use crate::cli::Args;
 // Lib for local FS
 
 pub fn get_file_list(path: &Path) -> Result<Vec<File>, Error> {
-    
     fs::read_dir(path)?
         .filter(|r| r.is_ok()) // Get rid of Err variants for Result<DirEntry>
         .map(|r| r.unwrap().path()) // This is safe, since we only have the Ok variants
@@ -43,8 +42,6 @@ pub fn get_file_list(path: &Path) -> Result<Vec<File>, Error> {
 }
 
 pub fn get_folder_list(path: &Path) -> Result<Vec<Folder>, Error> {
-    
-
     fs::read_dir(path)?
         .filter(|r| r.is_ok()) // Get rid of Err variants for Result<DirEntry>
         .map(|r| r.unwrap().path()) // This is safe, since we only have the Ok variants
@@ -95,12 +92,10 @@ fn get_dir_content_length(path: &Path) -> Result<i32, Error> {
             let file_len = directories.files.len();
             Ok((dir_len + file_len - 1) as i32)
         }
-        Err(_) => {
-            Err(Error::new(
-                ErrorKind::InvalidInput,
-                "Error getting folder content",
-            ))
-        }
+        Err(_) => Err(Error::new(
+            ErrorKind::InvalidInput,
+            "Error getting folder content",
+        )),
     }
 }
 
@@ -147,10 +142,7 @@ pub fn connection(args: &Args, mut sess: Session) -> Result<Session, std::io::Er
 }
 
 pub fn get_remote_file_list(path: &Path, sftp: Sftp) -> Result<Vec<File>, Error> {
-    
-
-    sftp
-        .readdir(path)?
+    sftp.readdir(path)?
         .into_iter()
         .filter(|r| r.1.is_file())
         .map(|x| {
@@ -172,10 +164,7 @@ pub fn get_remote_file_list(path: &Path, sftp: Sftp) -> Result<Vec<File>, Error>
 }
 
 pub fn get_remote_folder_list(path: &Path, sftp: &Sftp) -> Result<Vec<Folder>, Error> {
-    
-
-    sftp
-        .readdir(path)?
+    sftp.readdir(path)?
         .into_iter()
         .filter(|r| r.1.is_dir())
         .map(|x| {

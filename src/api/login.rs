@@ -12,34 +12,32 @@ pub async fn login(
 ) -> Result<HttpResponse, Error> {
     match get_user(&data.name) {
         Ok(user) => match &user["password"].as_str() {
-            Some(password) => {
-                match compare_password(password.to_owned(), &data.password) {
-                    Ok(verify) => {
-                        if verify {
-                            let duration = st.args.jwt_duration.unwrap_or(30);
-                            if let Ok(token) =
-                                create_token(&data.name, duration, st.args.clone().jwt_secret)
-                            {
-                                Ok(HttpResponse::Ok().json(JsonRes { data: token }))
-                            } else {
-                                Ok(HttpResponse::BadGateway()
-                                    .content_type("text/plain")
-                                    .body("Error creating token"))
-                            }
+            Some(password) => match compare_password(password.to_owned(), &data.password) {
+                Ok(verify) => {
+                    if verify {
+                        let duration = st.args.jwt_duration.unwrap_or(30);
+                        if let Ok(token) =
+                            create_token(&data.name, duration, st.args.clone().jwt_secret)
+                        {
+                            Ok(HttpResponse::Ok().json(JsonRes { data: token }))
                         } else {
-                            Ok(HttpResponse::Unauthorized()
+                            Ok(HttpResponse::BadGateway()
                                 .content_type("text/plain")
-                                .body("Invalid password"))
+                                .body("Error creating token"))
                         }
-                    }
-                    Err(e) => {
-                        let body = format!("{:?}", e);
-                        Ok(HttpResponse::BadGateway()
+                    } else {
+                        Ok(HttpResponse::Unauthorized()
                             .content_type("text/plain")
-                            .body(body))
+                            .body("Invalid password"))
                     }
                 }
-            }
+                Err(e) => {
+                    let body = format!("{:?}", e);
+                    Ok(HttpResponse::BadGateway()
+                        .content_type("text/plain")
+                        .body(body))
+                }
+            },
             None => Ok(HttpResponse::Unauthorized()
                 .content_type("text/plain")
                 .body("invalid password")),

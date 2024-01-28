@@ -47,21 +47,21 @@ pub async fn upload(
     let file_path = std::path::Path::new(&info.path);
     utils::check_auth_path(file_path)?;
     let upload_status = save_local_file(payload, file_path).await;
-    let val= match upload_status {
-            Ok(Some(val)) => {
-                if val{
-                    Ok(HttpResponse::Ok()
+    let val = match upload_status {
+        Ok(Some(val)) => {
+            if val {
+                Ok(HttpResponse::Ok()
                     .content_type("text/plain")
                     .body("update_succeeded"))
-                }else{
-                    Ok(HttpResponse::BadRequest()
+            } else {
+                Ok(HttpResponse::BadRequest()
                     .content_type("text/plain")
                     .body("update_failed"))
-                }
-            },
-            _ => Ok(HttpResponse::BadRequest()
-                .content_type("text/plain")
-                .body("update_failed")),
+            }
+        }
+        _ => Ok(HttpResponse::BadRequest()
+            .content_type("text/plain")
+            .body("update_failed")),
     };
     val
 }
@@ -109,22 +109,22 @@ pub async fn upload_remote_file(
     let file_path = std::path::Path::new(&info.path);
     utils::check_auth_path(file_path)?;
     let upload_status = save_remote_file(payload, sess.sess.as_ref().unwrap(), file_path).await;
-    let val= match upload_status {
-            Ok(Some(val)) =>{ 
-                if val{
-                    Ok(HttpResponse::Ok()
+    let val = match upload_status {
+        Ok(Some(val)) => {
+            if val {
+                Ok(HttpResponse::Ok()
                     .content_type("text/plain")
                     .body("update_succeeded"))
-                }else{
-                    Ok(HttpResponse::BadRequest()
+            } else {
+                Ok(HttpResponse::BadRequest()
                     .content_type("text/plain")
                     .body("update_failed"))
-                }
-            },
-            _ => Ok(HttpResponse::BadRequest()
-                .content_type("text/plain")
-                .body("update_failed")),
-        };
-        
+            }
+        }
+        _ => Ok(HttpResponse::BadRequest()
+            .content_type("text/plain")
+            .body("update_failed")),
+    };
+
     val
 }

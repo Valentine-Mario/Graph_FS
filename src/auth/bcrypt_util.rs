@@ -8,10 +8,7 @@ pub fn encrypt_password(password: &String) -> Result<String, BcryptError> {
     Ok(hashed)
 }
 
-pub fn compare_password(
-    user_password: &str,
-    given_password: &str,
-) -> Result<bool, BcryptError> {
+pub fn compare_password(user_password: &str, given_password: &str) -> Result<bool, BcryptError> {
     let valid = verify(given_password, user_password)?;
     Ok(valid)
 }
