@@ -3,7 +3,7 @@ use std::str::FromStr;
 use structopt::StructOpt;
 type ParseError = &'static str;
 
-#[derive(Debug, StructOpt, Clone)]
+#[derive(Debug, StructOpt, Clone, Default)]
 #[structopt(name = "GraphFS ", about = "GraphFS tool")]
 pub struct Args {
     // Select host
@@ -118,20 +118,20 @@ pub enum UserConfig {
 /// Auth options for ssh credentials
 pub enum AuthOption {
     /// Attempt basic password authentication.
-    UserauthPassword,
+    Password,
     /// Authenticate the current connection with the first public key found in an SSH agent
-    UserauthAgent,
+    Agent,
     /// Attempt public key authentication using a PEM encoded private key file stored on disk.
-    UserauthPubkeyFile,
+    PubkeyFile,
 }
 
 impl FromStr for AuthOption {
     type Err = ParseError;
     fn from_str(types: &str) -> Result<Self, Self::Err> {
         match types {
-            "user_password" => Ok(Self::UserauthPassword),
-            "user_agent" => Ok(Self::UserauthAgent),
-            "user_pub_key" => Ok(Self::UserauthPubkeyFile),
+            "user_password" => Ok(Self::Password),
+            "user_agent" => Ok(Self::Agent),
+            "user_pub_key" => Ok(Self::PubkeyFile),
             _ => Err("Could not parse auth type"),
         }
     }

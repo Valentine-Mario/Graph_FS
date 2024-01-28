@@ -34,13 +34,9 @@ fn is_authorized(req: &HttpRequest) -> bool {
     if args.use_auth.is_some() && args.use_auth.unwrap() {
         if let Some(value) = req.headers().get("authorization") {
             if let Ok(user) =
-                jwt::decode_token(&value.to_str().unwrap_or("").to_string(), args.jwt_secret)
+                jwt::decode_token(value.to_str().unwrap_or(""), args.jwt_secret)
             {
-                if let Ok(_) = get_user(&user) {
-                    true
-                } else {
-                    false
-                }
+                get_user(&user).is_ok()
             } else {
                 false
             }
@@ -52,7 +48,7 @@ fn is_authorized(req: &HttpRequest) -> bool {
     }
 }
 
-pub fn check_write_access(args: Args, token: &String) -> bool {
+pub fn check_write_access(args: Args, token: &str) -> bool {
     if args.use_auth.is_some() && args.use_auth.unwrap() {
         if let Ok(user) = jwt::decode_token(token, args.jwt_secret) {
             if let Ok(usr_details) = get_user(&user) {

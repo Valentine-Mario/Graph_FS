@@ -120,14 +120,14 @@ pub fn connection(args: &Args, mut sess: Session) -> Result<Session, std::io::Er
     match args.auth_option {
         Some(auth_option) => {
             match auth_option {
-                crate::cli::AuthOption::UserauthAgent => {
+                crate::cli::AuthOption::Agent => {
                     sess.userauth_agent(&args.username.unwrap()).unwrap();
                 }
-                crate::cli::AuthOption::UserauthPassword => {
+                crate::cli::AuthOption::Password => {
                     sess.userauth_password(&args.username.unwrap(), &args.password.unwrap())
                         .unwrap();
                 }
-                crate::cli::AuthOption::UserauthPubkeyFile => {
+                crate::cli::AuthOption::PubkeyFile => {
                     sess.userauth_pubkey_file(
                         &args.username.unwrap(),
                         Some(Path::new(&args.pub_key.unwrap())),

@@ -13,7 +13,7 @@ pub async fn login(
     match get_user(&data.name) {
         Ok(user) => match &user["password"].as_str() {
             Some(password) => {
-                match compare_password(&password.to_owned().to_string(), &data.password) {
+                match compare_password(password.to_owned(), &data.password) {
                     Ok(verify) => {
                         if verify {
                             let duration = st.args.jwt_duration.unwrap_or(30);

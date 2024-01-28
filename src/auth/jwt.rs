@@ -46,7 +46,7 @@ mod jwt_numeric_date {
     }
 }
 
-pub fn validate_token(token: &String, args: Args) -> Result<bool, Box<dyn std::error::Error>> {
+pub fn validate_token(token: &str, args: Args) -> Result<bool, Box<dyn std::error::Error>> {
     let _token_data = jsonwebtoken::decode::<Claims>(
         token,
         &DecodingKey::from_secret(args.jwt_secret.unwrap().as_bytes()),
@@ -56,7 +56,7 @@ pub fn validate_token(token: &String, args: Args) -> Result<bool, Box<dyn std::e
 }
 
 pub fn decode_token(
-    token: &String,
+    token: &str,
     secret: Option<String>,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let token_data = jsonwebtoken::decode::<Claims>(
