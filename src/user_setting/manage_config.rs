@@ -3,7 +3,7 @@ use toml::{Table, Value};
 use toml_edit::{value, Document};
 
 use crate::{auth::bcrypt_util::encrypt_password, cli::Args};
-const GRAPH_FS_CONFIG: &str = "./graph_fs.toml";
+pub const GRAPH_FS_CONFIG: &str = "./graph_fs.toml";
 
 pub fn add_user(args: &Args) -> Result<(), Error> {
     check_for_config();
@@ -39,13 +39,13 @@ pub fn add_user(args: &Args) -> Result<(), Error> {
     }
 }
 
-pub fn delete_user(args: &Args) -> Result<(), Error> {
+pub fn delete_user(args: &Option<String>) -> Result<(), Error> {
     check_for_config();
     //if no acc name or passqword is provided, terminate program
-    if args.account_name.is_none() {
+    if args.is_none() {
         panic!("Please provide a valid acc username")
     }
-    let acc_user = args.clone().account_name.unwrap();
+    let acc_user = args.clone().unwrap();
 
     //parse raw toml config
     let data = read_config_file().unwrap();

@@ -8,7 +8,7 @@ pub fn manage_update(args: &Args) -> Result<(), Error> {
     match &args.manage_users {
         Some(options) => match options {
             AddUser => manage_config::add_user(args),
-            DeleteUser => manage_config::delete_user(args),
+            DeleteUser => manage_config::delete_user(&args.account_name),
             UpdateUserName => manage_config::edit_user_acc_name(args),
             UpdateUserPassword => manage_config::edit_user_acc_password(args),
             UpdateUserPermission => manage_config::edit_user_acc_priviledge(args),
