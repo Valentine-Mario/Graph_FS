@@ -31,9 +31,9 @@ fn add_user_util() -> Result<(), std::io::Error> {
 #[test]
 fn test_add_user() {
     let add = add_user_util();
-    assert_eq!(add.is_ok(), true);
+    assert!(add.is_ok());
     let user = get_user("user_name");
-    assert_eq!(user.is_ok(), true);
+    assert!(user.is_ok());
     let _my_setup = CleanUp;
 }
 
@@ -42,11 +42,11 @@ fn test_delete_user() {
     let add = add_user_util();
     let arg = args_factory();
 
-    assert_eq!(add.is_ok(), true);
+    assert!(add.is_ok());
     let deleted_user = delete_user(&arg.account_name);
-    assert_eq!(deleted_user.is_ok(), true);
+    assert!(deleted_user.is_ok());
     let user = get_user("user_name");
-    assert_eq!(user.is_err(), true);
+    assert!(user.is_err());
     let _my_setup = CleanUp;
 }
 
@@ -55,13 +55,13 @@ fn test_edit_user() {
     let add = add_user_util();
     let arg = args_factory();
 
-    assert_eq!(add.is_ok(), true);
+    assert!(add.is_ok());
     let edited_user = edit_user_acc_name(&arg);
-    assert_eq!(edited_user.is_ok(), true);
+    assert!(edited_user.is_ok());
     let user = get_user("user_name");
-    assert_eq!(user.is_err(), true);
+    assert!(user.is_err());
     let user = get_user("user_name_new");
-    assert_eq!(user.is_ok(), true);
+    assert!(user.is_ok());
     let _my_setup = CleanUp;
 }
 
@@ -70,11 +70,11 @@ fn test_edit_password() {
     let add = add_user_util();
     let arg = args_factory();
 
-    assert_eq!(add.is_ok(), true);
+    assert!(add.is_ok());
     let edited_user = edit_user_acc_password(&arg);
-    assert_eq!(edited_user.is_ok(), true);
+    assert!(edited_user.is_ok());
     let user = get_user("user_name");
-    assert_eq!(user.is_ok(), true);
+    assert!(user.is_ok());
     let _my_setup = CleanUp;
 }
 
@@ -83,10 +83,10 @@ fn test_edit_priviledge() {
     let add = add_user_util();
     let arg = args_factory();
 
-    assert_eq!(add.is_ok(), true);
+    assert!(add.is_ok());
     let edited_user = edit_user_acc_priviledge(&arg);
-    assert_eq!(edited_user.is_ok(), true);
+    assert!(edited_user.is_ok());
     let user = get_user("user_name");
-    assert_eq!(user.is_ok(), true);
+    assert!(user.is_ok());
     let _my_setup = CleanUp;
 }

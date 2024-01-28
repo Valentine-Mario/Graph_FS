@@ -90,7 +90,7 @@ pub fn edit_user_acc_name(args: &Args) -> Result<(), Error> {
                 //construct valid toml file
                 let mut doc = data.parse::<Document>().expect("invalid doc");
                 //update the new user profile
-                doc[&acc_user]["name"] = value(&args.clone().new_account_name.unwrap());
+                doc[&acc_user]["name"] = value(args.clone().new_account_name.unwrap());
                 //store the profile in a n-> Result<(), Error>  ew variable
                 let new_profile = doc.get(&acc_user).unwrap();
                 //set the key to the new profile name
@@ -158,7 +158,7 @@ pub fn edit_user_acc_priviledge(args: &Args) -> Result<(), Error> {
             } else {
                 //construct valid toml file
                 let mut doc = data.parse::<Document>().expect("invalid doc");
-                doc[&acc_user]["permission"] = value(&acc_permission);
+                doc[&acc_user]["permission"] = value(acc_permission);
 
                 write_config_file(&doc.to_string()).expect("error writing config");
             }
@@ -197,5 +197,5 @@ fn read_config_file() -> std::io::Result<String> {
 }
 
 fn write_config_file(data: &str) -> std::io::Result<()> {
-    Ok(std::fs::write(GRAPH_FS_CONFIG, data.as_bytes())?)
+    std::fs::write(GRAPH_FS_CONFIG, data.as_bytes())
 }

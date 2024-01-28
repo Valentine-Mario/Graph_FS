@@ -24,15 +24,15 @@ impl LocalFsQuery {
     #[graphql(description = "Returns a list of all files in directory")]
     fn read_file_in_dir(path: String) -> FieldResult<Vec<File>> {
         let path = Path::new(&path);
-        check_auth_path(&path)?;
-        Ok(get_file_list(&path)?)
+        check_auth_path(path)?;
+        Ok(get_file_list(path)?)
     }
 
     #[graphql(description = "Return the list of all folders in a directory")]
     fn read_dir_in_dir(path: String) -> FieldResult<Vec<Folder>> {
         let path = Path::new(&path);
-        check_auth_path(&path)?;
-        Ok(get_folder_list(&path)?)
+        check_auth_path(path)?;
+        Ok(get_folder_list(path)?)
     }
 }
 
@@ -48,10 +48,10 @@ impl LocalFsMutation {
             )));
         }
         let from_path = Path::new(&from);
-        check_auth_path(&from_path)?;
+        check_auth_path(from_path)?;
 
         let to_path = Path::new(&to);
-        check_auth_path(&to_path)?;
+        check_auth_path(to_path)?;
         fs::rename(from_path, to_path)?;
         Ok(Message::new(String::from("Item renamed successfully")))
     }
@@ -64,10 +64,10 @@ impl LocalFsMutation {
             )));
         }
         let to_path = Path::new(&to);
-        check_auth_path(&to_path)?;
+        check_auth_path(to_path)?;
         // Check if all from destination is permitted diurectory
         for item in from.iter() {
-            check_auth_path(&Path::new(&item))?;
+            check_auth_path(Path::new(&item))?;
         }
         let options = dir::CopyOptions::new();
         move_items(&from, to, &options)?;
@@ -82,10 +82,10 @@ impl LocalFsMutation {
             )));
         }
         let to_path = Path::new(&to);
-        check_auth_path(&to_path)?;
+        check_auth_path(to_path)?;
         // Check if all from destination is permitted diurectory
         for item in from.iter() {
-            check_auth_path(&Path::new(&item))?;
+            check_auth_path(Path::new(&item))?;
         }
         let options = dir::CopyOptions::new();
         copy_items(&from, to, &options)?;
@@ -100,7 +100,7 @@ impl LocalFsMutation {
             )));
         }
         let path = Path::new(&path);
-        check_auth_path(&path)?;
+        check_auth_path(path)?;
         fs::remove_dir_all(path)?;
         Ok(Message::new(String::from("Directory deleted successfully")))
     }
@@ -113,7 +113,7 @@ impl LocalFsMutation {
             )));
         }
         let path = Path::new(&path);
-        check_auth_path(&path)?;
+        check_auth_path(path)?;
         fs::remove_file(path)?;
         Ok(Message::new(String::from("File deleted successfully")))
     }
@@ -126,7 +126,7 @@ impl LocalFsMutation {
             )));
         }
         let path = Path::new(&path);
-        check_auth_path(&path)?;
+        check_auth_path(path)?;
         fs::create_dir_all(path)?;
         Ok(Message::new(String::from("Directory created successfully")))
     }
@@ -139,7 +139,7 @@ impl LocalFsMutation {
             )));
         }
         let path = Path::new(&path);
-        check_auth_path(&path)?;
+        check_auth_path(path)?;
         RFile::create(path)?;
         Ok(Message::new(String::from("File created successfully")))
     }
@@ -159,7 +159,7 @@ impl LocalFsMutation {
             )));
         }
         let path = Path::new(&path);
-        check_auth_path(&path)?;
+        check_auth_path(path)?;
         let bytes = general_purpose::STANDARD.decode(payload)?;
         let mut file = fs::OpenOptions::new()
             .read(true)

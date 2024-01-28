@@ -9,12 +9,12 @@ pub fn check_auth_path(child: &Path) -> Result<bool, Error> {
         .expect("please specify authorized path");
     let parent = Path::new(path);
     if child.starts_with(parent) {
-        return Ok(true);
+        Ok(true)
     } else {
-        return Err(Error::new(
+        Err(Error::new(
             ErrorKind::PermissionDenied,
             "unauthorized to access directory",
-        ));
+        ))
     }
 }
 

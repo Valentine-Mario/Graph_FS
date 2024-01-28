@@ -90,8 +90,8 @@ pub fn buffer_response(mut x: Vec<u8>) -> HttpResponse {
 
                     yield Bytes::copy_from_slice(&u[..4096]);
                 }else{
-                    let u:Vec<u8>=x.drain(0..x.len()).collect();
-                    if u.len()==0{
+                    let u:Vec<u8>=std::mem::take(&mut x);
+                    if u.is_empty(){
                         break
                     }
                     yield Bytes::copy_from_slice(&u[..u.len()]);

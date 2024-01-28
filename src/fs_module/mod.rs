@@ -10,5 +10,5 @@ pub fn graphql_write_access(context: &Context) -> bool {
         let token = context.clone().auth_token.unwrap_or("".to_string());
         return check_write_access(context.args.clone(), &token);
     }
-    return true;
+    true
 }

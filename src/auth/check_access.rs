@@ -58,11 +58,7 @@ pub fn check_write_access(args: Args, token: &String) -> bool {
             if let Ok(usr_details) = get_user(&user) {
                 match usr_details.get("permission") {
                     Some(permission) => {
-                        if permission.as_str().unwrap_or("").trim() == "read" {
-                            return false;
-                        } else {
-                            return true;
-                        }
+                        return permission.as_str().unwrap_or("").trim() != "read"
                     }
                     None => return true,
                 }
@@ -73,5 +69,5 @@ pub fn check_write_access(args: Args, token: &String) -> bool {
             return false;
         }
     }
-    return true;
+    true
 }

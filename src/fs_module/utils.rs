@@ -19,8 +19,8 @@ use crate::cli::Args;
 // Lib for local FS
 
 pub fn get_file_list(path: &Path) -> Result<Vec<File>, Error> {
-    let file_list = fs::read_dir(path)?
-        .into_iter()
+    
+    fs::read_dir(path)?
         .filter(|r| r.is_ok()) // Get rid of Err variants for Result<DirEntry>
         .map(|r| r.unwrap().path()) // This is safe, since we only have the Ok variants
         .filter(|r| r.is_file()) // Filter out non-files
@@ -39,13 +39,13 @@ pub fn get_file_list(path: &Path) -> Result<Vec<File>, Error> {
                 last_modified,
             ))
         })
-        .collect::<Result<Vec<File>, Error>>();
-    file_list
+        .collect::<Result<Vec<File>, Error>>()
 }
 
 pub fn get_folder_list(path: &Path) -> Result<Vec<Folder>, Error> {
-    let folder_list = fs::read_dir(path)?
-        .into_iter()
+    
+
+    fs::read_dir(path)?
         .filter(|r| r.is_ok()) // Get rid of Err variants for Result<DirEntry>
         .map(|r| r.unwrap().path()) // This is safe, since we only have the Ok variants
         .filter(|r| r.is_dir()) // Filter out non-files
@@ -56,9 +56,7 @@ pub fn get_folder_list(path: &Path) -> Result<Vec<Folder>, Error> {
 
             Ok(Folder::new(name, content_length, parent_folder))
         })
-        .collect::<Result<Vec<Folder>, Error>>();
-
-    folder_list
+        .collect::<Result<Vec<Folder>, Error>>()
 }
 
 fn get_file_size(path: &Path) -> Result<f64, Error> {
@@ -95,10 +93,10 @@ fn get_dir_content_length(path: &Path) -> Result<i32, Error> {
         Ok(directories) => {
             let dir_len = directories.directories.len();
             let file_len = directories.files.len();
-            return Ok((dir_len + file_len - 1) as i32);
+            Ok((dir_len + file_len - 1) as i32)
         }
         Err(_) => {
-            return Err(Error::new(
+            Err(Error::new(
                 ErrorKind::InvalidInput,
                 "Error getting folder content",
             ))
@@ -149,7 +147,9 @@ pub fn connection(args: &Args, mut sess: Session) -> Result<Session, std::io::Er
 }
 
 pub fn get_remote_file_list(path: &Path, sftp: Sftp) -> Result<Vec<File>, Error> {
-    let file_list = sftp
+    
+
+    sftp
         .readdir(path)?
         .into_iter()
         .filter(|r| r.1.is_file())
@@ -168,13 +168,13 @@ pub fn get_remote_file_list(path: &Path, sftp: Sftp) -> Result<Vec<File>, Error>
                 last_modified,
             ))
         })
-        .collect::<Result<Vec<File>, Error>>();
-
-    file_list
+        .collect::<Result<Vec<File>, Error>>()
 }
 
 pub fn get_remote_folder_list(path: &Path, sftp: &Sftp) -> Result<Vec<Folder>, Error> {
-    let folder_list = sftp
+    
+
+    sftp
         .readdir(path)?
         .into_iter()
         .filter(|r| r.1.is_dir())
@@ -185,9 +185,7 @@ pub fn get_remote_folder_list(path: &Path, sftp: &Sftp) -> Result<Vec<Folder>, E
 
             Ok(Folder::new(name, content_length, parent_folder))
         })
-        .collect::<Result<Vec<Folder>, Error>>();
-
-    folder_list
+        .collect::<Result<Vec<Folder>, Error>>()
 }
 
 fn get_remote_dir_content_length(path: &Path, sftp: &Sftp) -> Result<usize, Error> {
