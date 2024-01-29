@@ -2,8 +2,6 @@ use chrono::prelude::*;
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 
-use crate::cli::Args;
-
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Claims {
     pub sub: String,
@@ -46,10 +44,13 @@ mod jwt_numeric_date {
     }
 }
 
-pub fn validate_token(token: &str, args: Args) -> Result<bool, Box<dyn std::error::Error>> {
+pub fn validate_token(
+    token: &str,
+    secret: Option<String>,
+) -> Result<bool, Box<dyn std::error::Error>> {
     let _token_data = jsonwebtoken::decode::<Claims>(
         token,
-        &DecodingKey::from_secret(args.jwt_secret.unwrap().as_bytes()),
+        &DecodingKey::from_secret(secret.unwrap_or("default".to_string()).as_bytes()),
         &Validation::default(),
     )?;
     Ok(true)
@@ -68,7 +69,7 @@ pub fn decode_token(
 }
 
 pub fn create_token(
-    user: &String,
+    user: &str,
     duration: i64,
     secret: Option<String>,
 ) -> Result<String, Box<dyn std::error::Error>> {
