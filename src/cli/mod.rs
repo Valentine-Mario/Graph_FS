@@ -97,6 +97,14 @@ pub struct Args {
     //jwt duration
     #[structopt(long = "jwt_duration")]
     pub jwt_duration: Option<i64>,
+
+    //storage type
+    #[structopt(long = "storage")]
+    pub storage: Option<String>,
+
+    //db connection string
+    #[structopt(long = "storage_path")]
+    pub storage_path: Option<String>,
 }
 
 impl Args {

@@ -1,6 +1,7 @@
 mod api;
 pub mod auth;
 mod cli;
+pub mod db;
 mod fs_module;
 pub mod http_config;
 pub mod schema;

@@ -7,4 +7,5 @@ pub mod schema;
 pub mod user_setting;
 pub mod utils;
 use ssh2::Session;
+pub mod db;
 pub mod factory;

@@ -5,9 +5,19 @@ use juniper::Context as JuniperContext;
 use juniper::GraphQLObject;
 use juniper::{futures, graphql_subscription, RootNode};
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use ssh2::Session;
 
 use crate::cli::Args;
+
+#[derive(Debug, FromRow)]
+struct User {
+    pub id: i64,
+    pub name: String,
+    pub email: String,
+    pub password: String,
+    pub permission: Option<String>,
+}
 
 #[derive(Debug, Clone, Copy)]
 pub enum MySshFileType {
