@@ -7,3 +7,4 @@ CREATE TABLE IF NOT EXISTS users (
     permission TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );"#;
+//Realboy2233?
