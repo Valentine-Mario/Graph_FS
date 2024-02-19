@@ -8,10 +8,16 @@ CREATE TABLE IF NOT EXISTS users (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );"#;
 
-pub const GET_USER_SQL: &str = r#"
-    SELECT email, password, permission
+pub const GET_USER_BY_EMAIL_SQL: &str = r#"
+    SELECT id, email, password, permission
     FROM users
     WHERE email = $1
+"#;
+
+pub const GET_USER_BY_ID_SQL: &str = r#"
+    SELECT id, email, password, permission
+    FROM users
+    WHERE id = $1
 "#;
 
 pub const DELETE_USER_SQL: &str = r#"

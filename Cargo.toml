@@ -31,7 +31,7 @@ toml_edit = "0.21.0"
 chrono = { version = "0.4.31", features = ["serde"] }
 jsonwebtoken="7"
 bcrypt = "0.8"
-sqlx = { version = "0.7", features = [ "runtime-tokio", "tls-rustls" ] }
+sqlx = { version = "0.7.3", features = ["runtime-tokio-native-tls", "macros", "postgres", "sqlite" ] }
 
 
 [dependencies.uuid]

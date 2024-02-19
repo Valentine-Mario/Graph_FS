@@ -34,6 +34,6 @@ pub fn args_factory() -> Args {
         jwt_secret: Some("secret".to_string()),
         jwt_duration: Some(10),
         storage: None,
-        storage_path: None,
+        db_path: None,
     }
 }
