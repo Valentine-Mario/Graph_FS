@@ -28,6 +28,7 @@ pub fn args_factory() -> Args {
         use_auth: Some(true),
         manage_users: None,
         account_name: Some("user_name".to_string()),
+        account_email: Some("email".to_string()),
         account_password: Some("pass".to_string()),
         account_permission: Some("read".to_string()),
         new_account_name: Some("user_name_new".to_string()),

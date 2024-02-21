@@ -10,8 +10,8 @@ use ssh2::Session;
 
 use crate::cli::Args;
 
-#[derive(Debug, FromRow)]
-struct User {
+#[derive(Debug, FromRow, Clone)]
+pub struct User {
     pub id: i64,
     pub name: String,
     pub email: String,

@@ -78,6 +78,10 @@ pub struct Args {
     #[structopt(long = "acc_name")]
     pub account_name: Option<String>,
 
+    //email for new user
+    #[structopt(long = "acc_email")]
+    pub account_email: Option<String>,
+
     //password for user
     #[structopt(long = "acc_password")]
     pub account_password: Option<String>,

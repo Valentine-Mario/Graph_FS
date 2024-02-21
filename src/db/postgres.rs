@@ -33,24 +33,24 @@ pub const CRAETE_NEW_USER_SQL: &str = r#"
 
 pub const UPDATE_PERMISSION_SQL: &str = r#"
     UPDATE users
-    SET permission = $2
-    WHERE email = $1
+    SET permission = $1
+    WHERE email = $2
 "#;
 
 pub const UPDATE_PASSWORD_SQL: &str = r#"
     UPDATE users
-    SET password = $2
-    WHERE email = $1
+    SET password = $1
+    WHERE email = $2
 "#;
 
 pub const UPDATE_EMAIL_SQL: &str = r#"
     UPDATE users
-    SET email = $2
-    WHERE email = $1
+    SET email = $1
+    WHERE email = $2
 "#;
 
 pub const UPDATE_NAME_SQL: &str = r#"
     UPDATE users
-    SET name = $2
-    WHERE email = $1
+    SET name = $1
+    WHERE email = $2
 "#;
