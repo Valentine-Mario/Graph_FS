@@ -46,22 +46,28 @@ impl DBConn {
         }
     }
 
-    pub async fn create_user(&self, password: &str) -> Result<(), Error> {
+    pub async fn create_user(
+        &self,
+        name: &str,
+        email: &str,
+        password: &str,
+        permission: Option<String>,
+    ) -> Result<(), Error> {
         if self.args.storage.is_none() {
             let _row: (i64,) = sqlx::query_as(sqlite::CRAETE_NEW_USER_SQL)
-                .bind(self.args.clone().account_name)
-                .bind(self.args.clone().account_email)
+                .bind(name)
+                .bind(email)
                 .bind(password)
-                .bind(self.args.clone().account_permission)
+                .bind(permission)
                 .fetch_one(self.sqlite.as_ref().unwrap())
                 .await?;
             Ok(())
         } else {
             let _row: (i64,) = sqlx::query_as(postgres::CRAETE_NEW_USER_SQL)
-                .bind(self.args.clone().account_name)
-                .bind(self.args.clone().account_email)
+                .bind(name)
+                .bind(email)
                 .bind(password)
-                .bind(self.args.clone().account_permission)
+                .bind(permission)
                 .fetch_one(self.psql.as_ref().unwrap())
                 .await?;
             Ok(())
