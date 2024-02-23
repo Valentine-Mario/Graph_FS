@@ -107,7 +107,7 @@ pub struct Args {
     pub storage: Option<String>,
 
     //db connection string
-    #[structopt(long = "storage_path")]
+    #[structopt(long = "db_path")]
     pub db_path: Option<String>,
 }
 
