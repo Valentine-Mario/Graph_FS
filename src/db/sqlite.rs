@@ -9,13 +9,13 @@ CREATE TABLE IF NOT EXISTS users (
 );"#;
 
 pub const GET_USER_BY_EMAIL_SQL: &str = r#"
-    SELECT id, email, password, permission
+    SELECT id, name, email, password, permission
     FROM users
     WHERE email = ?
 "#;
 
 pub const GET_USER_BY_ID_SQL: &str = r#"
-    SELECT id, email, password, permission
+    SELECT id, name, email, password, permission
     FROM users
     WHERE id = ?
 "#;
