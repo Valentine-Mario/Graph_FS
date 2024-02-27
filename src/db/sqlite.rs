@@ -21,7 +21,7 @@ pub const GET_USER_BY_ID_SQL: &str = r#"
 "#;
 
 pub const DELETE_USER_SQL: &str = r#"
-    DELETE users
+    DELETE from users
     WHERE email = ?
 "#;
 
