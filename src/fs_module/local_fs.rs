@@ -41,12 +41,13 @@ pub struct LocalFsMutation;
 #[juniper::graphql_object(context = Context)]
 impl LocalFsMutation {
     #[graphql(description = "This mutation can be used to rename files or folders")]
-    fn rename_item(context: &Context, from: String, to: String) -> FieldResult<Message> {
-        if !graphql_write_access(context) {
+    async fn rename_item(context: &Context, from: String, to: String) -> FieldResult<Message> {
+        if !graphql_write_access(context).await {
             return Ok(Message::new(String::from(
                 "Unauthorized to perform write operation",
             )));
         }
+
         let from_path = Path::new(&from);
         check_auth_path(from_path)?;
 
@@ -57,8 +58,8 @@ impl LocalFsMutation {
     }
 
     #[graphql(description = "This mutation is used for moving file(s) or folder(s)")]
-    fn move_item(context: &Context, from: Vec<String>, to: String) -> FieldResult<Message> {
-        if !graphql_write_access(context) {
+    async fn move_item(context: &Context, from: Vec<String>, to: String) -> FieldResult<Message> {
+        if !graphql_write_access(context).await {
             return Ok(Message::new(String::from(
                 "Unauthorized to perform write operation",
             )));
@@ -75,8 +76,8 @@ impl LocalFsMutation {
     }
 
     #[graphql(description = "This mutation is to copy an item or group of items")]
-    fn copy_item(context: &Context, from: Vec<String>, to: String) -> FieldResult<Message> {
-        if !graphql_write_access(context) {
+    async fn copy_item(context: &Context, from: Vec<String>, to: String) -> FieldResult<Message> {
+        if !graphql_write_access(context).await {
             return Ok(Message::new(String::from(
                 "Unauthorized to perform write operation",
             )));
@@ -93,8 +94,8 @@ impl LocalFsMutation {
     }
 
     #[graphql(description = "Delete directory")]
-    fn delete_dir(context: &Context, path: String) -> FieldResult<Message> {
-        if !graphql_write_access(context) {
+    async fn delete_dir(context: &Context, path: String) -> FieldResult<Message> {
+        if !graphql_write_access(context).await {
             return Ok(Message::new(String::from(
                 "Unauthorized to perform write operation",
             )));
@@ -106,8 +107,8 @@ impl LocalFsMutation {
     }
 
     #[graphql(description = "Delete file")]
-    fn delete_file(context: &Context, path: String) -> FieldResult<Message> {
-        if !graphql_write_access(context) {
+    async fn delete_file(context: &Context, path: String) -> FieldResult<Message> {
+        if !graphql_write_access(context).await {
             return Ok(Message::new(String::from(
                 "Unauthorized to perform write operation",
             )));
@@ -119,8 +120,8 @@ impl LocalFsMutation {
     }
 
     #[graphql(description = "Create directory")]
-    fn create_dir(context: &Context, path: String) -> FieldResult<Message> {
-        if !graphql_write_access(context) {
+    async fn create_dir(context: &Context, path: String) -> FieldResult<Message> {
+        if !graphql_write_access(context).await {
             return Ok(Message::new(String::from(
                 "Unauthorized to perform write operation",
             )));
@@ -132,8 +133,8 @@ impl LocalFsMutation {
     }
 
     #[graphql(description = "Create file")]
-    fn create_file(context: &Context, path: String) -> FieldResult<Message> {
-        if !graphql_write_access(context) {
+    async fn create_file(context: &Context, path: String) -> FieldResult<Message> {
+        if !graphql_write_access(context).await {
             return Ok(Message::new(String::from(
                 "Unauthorized to perform write operation",
             )));
@@ -147,13 +148,13 @@ impl LocalFsMutation {
     #[graphql(
         description = "Update a file content at a seek position. For large file, use the upload endpoint. Payload should be in base64 encoding"
     )]
-    fn update_file(
+    async fn update_file(
         context: &Context,
         path: String,
         seek: i32,
         payload: String,
     ) -> FieldResult<Message> {
-        if !graphql_write_access(context) {
+        if !graphql_write_access(context).await {
             return Ok(Message::new(String::from(
                 "Unauthorized to perform write operation",
             )));

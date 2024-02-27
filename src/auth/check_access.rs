@@ -8,6 +8,7 @@ use futures::Future;
 
 use crate::auth::jwt;
 use crate::cli::Args;
+use crate::db::DBConn;
 use crate::schema::GraphqlWebData;
 use crate::user_setting::manage_config::get_user;
 
@@ -42,7 +43,7 @@ async fn is_authorized(req: HttpRequest, state: web::Data<GraphqlWebData>) -> bo
 
     if args.use_auth.is_some() && args.use_auth.unwrap() {
         if let Some(value) = req.headers().get("authorization") {
-            if let Ok(user) = jwt::decode_token(value.to_str().unwrap_or(""), args.jwt_secret) {
+            if let Ok(user) = jwt::decode_token(value.to_str().unwrap_or(""), &args.jwt_secret) {
                 state
                     .db_conn
                     .clone()
@@ -61,16 +62,18 @@ async fn is_authorized(req: HttpRequest, state: web::Data<GraphqlWebData>) -> bo
     }
 }
 
-pub fn check_write_access(args: Args, token: &str) -> bool {
+pub async fn check_write_access(args: Args, token: &str, conn: &DBConn) -> bool {
     if args.use_auth.is_some() && args.use_auth.unwrap() {
-        if let Ok(user) = jwt::decode_token(token, args.jwt_secret) {
-            if let Ok(usr_details) = get_user(&user) {
-                match usr_details.get("permission") {
-                    Some(permission) => return permission.as_str().unwrap_or("").trim() != "read",
-                    None => return true,
-                }
-            } else {
-                return false;
+        let secret = args.jwt_secret;
+        if jwt::decode_token(token, &secret).is_err() {
+            return false;
+        }
+        let user = jwt::decode_token(token, &secret).unwrap();
+
+        if let Ok(mut usr_details) = get_user(&user, conn).await {
+            match usr_details.pop() {
+                Some(user) => return user.permission.unwrap_or("".to_string()).trim() != "read",
+                None => return true,
             }
         } else {
             return false;

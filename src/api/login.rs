@@ -10,14 +10,14 @@ pub async fn login(
     st: web::Data<GraphqlWebData>,
     data: web::Json<LoginUser>,
 ) -> Result<HttpResponse, Error> {
-    match get_user(&data.name) {
-        Ok(user) => match &user["password"].as_str() {
-            Some(password) => match compare_password(password.to_owned(), &data.password) {
+    match get_user(&data.email, &st.db_conn.clone().unwrap()).await {
+        Ok(mut user) => match user.pop() {
+            Some(user) => match compare_password(&user.password, &data.password) {
                 Ok(verify) => {
                     if verify {
                         let duration = st.args.jwt_duration.unwrap_or(30);
                         if let Ok(token) =
-                            create_token(&data.name, duration, st.args.clone().jwt_secret)
+                            create_token(&user.email, duration, st.args.clone().jwt_secret)
                         {
                             Ok(HttpResponse::Ok().json(JsonRes { data: token }))
                         } else {

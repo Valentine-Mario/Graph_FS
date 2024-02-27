@@ -54,7 +54,7 @@ pub struct Folder {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LoginUser {
-    pub name: String,
+    pub email: String,
     pub password: String,
 }
 

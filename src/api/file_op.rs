@@ -37,7 +37,7 @@ pub async fn upload(
             .to_str()
             .unwrap_or("")
             .to_string();
-        if !check_write_access(st.args.clone(), &token) {
+        if !check_write_access(st.args.clone(), &token, st.db_conn.as_ref().unwrap()).await {
             return Ok(HttpResponse::Forbidden()
                 .content_type("text/plain")
                 .body("Unauthorized to perform write operation"));
@@ -99,7 +99,7 @@ pub async fn upload_remote_file(
             .to_str()
             .unwrap_or("")
             .to_string();
-        if !check_write_access(st.args.clone(), &token) {
+        if !check_write_access(st.args.clone(), &token, st.db_conn.as_ref().unwrap()).await {
             return Ok(HttpResponse::Forbidden()
                 .content_type("text/plain")
                 .body("Unauthorized to perform write operation"));

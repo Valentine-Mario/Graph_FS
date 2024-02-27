@@ -36,8 +36,8 @@ pub struct RemoteFsMutation;
 #[juniper::graphql_object(context = Context)]
 impl RemoteFsMutation {
     #[graphql(description = "Create file")]
-    fn create_file(context: &Context, path: String) -> FieldResult<Message> {
-        if !graphql_write_access(context) {
+    async fn create_file(context: &Context, path: String) -> FieldResult<Message> {
+        if !graphql_write_access(context).await {
             return Ok(Message::new(String::from(
                 "Unauthorized to perform write operation",
             )));
@@ -53,8 +53,12 @@ impl RemoteFsMutation {
     #[graphql(
         description = "Create directory. Set mode optionally, would default to allow user read and write without sudo"
     )]
-    fn create_dir(context: &Context, path: String, mode: Option<i32>) -> FieldResult<Message> {
-        if !graphql_write_access(context) {
+    async fn create_dir(
+        context: &Context,
+        path: String,
+        mode: Option<i32>,
+    ) -> FieldResult<Message> {
+        if !graphql_write_access(context).await {
             return Ok(Message::new(String::from(
                 "Unauthorized to perform write operation",
             )));
@@ -69,8 +73,8 @@ impl RemoteFsMutation {
     }
 
     #[graphql(description = "Delete a file")]
-    fn delete_file(context: &Context, path: String) -> FieldResult<Message> {
-        if !graphql_write_access(context) {
+    async fn delete_file(context: &Context, path: String) -> FieldResult<Message> {
+        if !graphql_write_access(context).await {
             return Ok(Message::new(String::from(
                 "Unauthorized to perform write operation",
             )));
@@ -84,8 +88,8 @@ impl RemoteFsMutation {
     }
 
     #[graphql(description = "Delete a folder")]
-    fn delete_dir(context: &Context, path: String) -> FieldResult<Message> {
-        if !graphql_write_access(context) {
+    async fn delete_dir(context: &Context, path: String) -> FieldResult<Message> {
+        if !graphql_write_access(context).await {
             return Ok(Message::new(String::from(
                 "Unauthorized to perform write operation",
             )));
@@ -99,8 +103,8 @@ impl RemoteFsMutation {
     }
 
     #[graphql(description = "Rename a file or folder, also used to move item")]
-    fn rename_item(context: &Context, from: String, to: String) -> FieldResult<Message> {
-        if !graphql_write_access(context) {
+    async fn rename_item(context: &Context, from: String, to: String) -> FieldResult<Message> {
+        if !graphql_write_access(context).await {
             return Ok(Message::new(String::from(
                 "Unauthorized to perform write operation",
             )));

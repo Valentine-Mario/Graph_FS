@@ -56,7 +56,7 @@ async fn main() -> std::io::Result<()> {
         }
     } else {
         //manage account here
-        user_setting::manage_update(&args)?;
+        user_setting::manage_update(&args).await?;
         Ok(())
     }
 }

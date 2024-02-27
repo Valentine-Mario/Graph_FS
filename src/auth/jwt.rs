@@ -58,11 +58,16 @@ pub fn validate_token(
 
 pub fn decode_token(
     token: &str,
-    secret: Option<String>,
+    secret: &Option<String>,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let token_data = jsonwebtoken::decode::<Claims>(
         token,
-        &DecodingKey::from_secret(secret.unwrap_or(String::from("default")).as_bytes()),
+        &DecodingKey::from_secret(
+            secret
+                .to_owned()
+                .unwrap_or(String::from("default"))
+                .as_bytes(),
+        ),
         &Validation::default(),
     )?;
     Ok(token_data.claims.company)
