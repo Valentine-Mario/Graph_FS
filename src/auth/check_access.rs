@@ -16,6 +16,7 @@ impl FromRequest for Authorized {
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        println!("called");
         if is_authorized(req) {
             Box::pin(async move { Ok(Authorized) })
         } else {

@@ -9,6 +9,7 @@ use sqlx::FromRow;
 use ssh2::Session;
 
 use crate::cli::Args;
+use crate::db;
 
 #[derive(Debug, FromRow, Clone)]
 pub struct User {
@@ -135,6 +136,7 @@ pub struct GraphqlWebData {
     pub sess: Option<Session>,
     pub schema: Schema,
     pub args: Args,
+    pub db_conn: Option<db::DBConn>,
 }
 
 #[derive(Clone)]
@@ -142,4 +144,5 @@ pub struct Context {
     pub sess: Option<Session>,
     pub auth_token: Option<String>,
     pub args: Args,
+    pub db_conn: Option<db::DBConn>,
 }

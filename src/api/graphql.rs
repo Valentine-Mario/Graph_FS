@@ -31,6 +31,7 @@ pub async fn graphql(
                 //set auth token to context
                 auth_token: Some(token_value.to_str().unwrap_or("").to_string()),
                 args: st.args.clone(),
+                db_conn: st.db_conn.clone(),
             };
             let value = data.execute(&st.schema, &ctx).await;
             HttpResponse::Ok().json(value)
@@ -41,6 +42,7 @@ pub async fn graphql(
                 sess: st.sess.clone(),
                 auth_token: None,
                 args: st.args.clone(),
+                db_conn: st.db_conn.clone(),
             };
             let value = data.execute(&st.schema, &ctx).await;
             HttpResponse::Ok().json(value)

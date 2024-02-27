@@ -6,6 +6,7 @@ use crate::schema::User;
 pub mod postgres;
 pub mod sqlite;
 
+#[derive(Clone)]
 pub struct DBConn {
     pub psql: Option<Pool<Postgres>>,
     pub sqlite: Option<Pool<Sqlite>>,

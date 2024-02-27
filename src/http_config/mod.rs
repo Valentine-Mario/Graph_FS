@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
 use crate::{
-    api::{self},
+    api,
     cli::Args,
-    fs_module,
+    db, fs_module,
     schema::{create_schema, GraphqlWebData},
 };
 use actix_cors::Cors;
@@ -43,13 +43,20 @@ fn remote_fs_routes(cfg: &mut web::ServiceConfig) {
 
 pub async fn local_server(args: Args) -> std::io::Result<()> {
     let arg = args.clone();
+    let dbase: Option<db::DBConn> = if args.use_auth.is_some() && args.use_auth.unwrap() {
+        Some(db::DBConn::new().await.unwrap())
+    } else {
+        None
+    };
+
     HttpServer::new(move || {
-        //contains only schema
         let local_data = Arc::new(GraphqlWebData {
             schema: create_schema(),
             sess: None,
             args: args.clone(),
+            db_conn: dbase.clone(),
         });
+
         App::new()
             .app_data(Data::from(local_data))
             .configure(local_fs_routes)
@@ -65,15 +72,23 @@ pub async fn local_server(args: Args) -> std::io::Result<()> {
 
 pub async fn remote_server(args: Args) -> std::io::Result<()> {
     let arg = args.clone();
+    let dbase: Option<db::DBConn> = if args.use_auth.is_some() && args.use_auth.unwrap() {
+        Some(db::DBConn::new().await.unwrap())
+    } else {
+        None
+    };
+
     HttpServer::new(move || {
         let mut sess: Session = Session::new().expect("Failed to connect to SSH");
         // Create authenticated session
         sess = fs_module::utils::connection(&args, sess).expect("Error creating sessions");
         //contains schema and ssh auth session
+
         let remote_data = Arc::new(GraphqlWebData {
             schema: create_schema(),
             sess: Some(sess),
             args: args.clone(),
+            db_conn: dbase.clone(),
         });
         App::new()
             .app_data(Data::from(remote_data))
@@ -93,14 +108,20 @@ pub async fn local_server_ssl(args: Args) -> std::io::Result<()> {
     let ssl_builder = ssl_builder(&args).expect("error build ssl connection");
 
     let addr = format!("{}:{}", &arg.host.unwrap(), &arg.port.unwrap());
+    let dbase: Option<db::DBConn> = if args.use_auth.is_some() && args.use_auth.unwrap() {
+        Some(db::DBConn::new().await.unwrap())
+    } else {
+        None
+    };
 
     HttpServer::new(move || {
-        //contains only schema
         let local_data = Arc::new(GraphqlWebData {
             schema: create_schema(),
             sess: None,
             args: args.clone(),
+            db_conn: dbase.clone(),
         });
+
         App::new()
             .app_data(Data::from(local_data))
             .configure(local_fs_routes)
@@ -119,16 +140,24 @@ pub async fn remote_server_ssl(args: Args) -> std::io::Result<()> {
     let ssl_builder = ssl_builder(&args).expect("error build ssl connection");
 
     let addr = format!("{}:{}", &arg.host.unwrap(), &arg.port.unwrap());
+    let dbase: Option<db::DBConn> = if args.use_auth.is_some() && args.use_auth.unwrap() {
+        Some(db::DBConn::new().await.unwrap())
+    } else {
+        None
+    };
 
     HttpServer::new(move || {
         let mut sess: Session = Session::new().expect("Failed to connect to SSH");
         // Create authenticated session
         sess = fs_module::utils::connection(&args, sess).expect("Error creating sessions");
+
         let remote_data = Arc::new(GraphqlWebData {
             schema: create_schema(),
             sess: Some(sess),
             args: args.clone(),
+            db_conn: dbase.clone(),
         });
+
         App::new()
             .app_data(Data::from(remote_data))
             .configure(remote_fs_routes)
