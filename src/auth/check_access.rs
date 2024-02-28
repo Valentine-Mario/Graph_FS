@@ -44,13 +44,13 @@ async fn is_authorized(req: HttpRequest, state: web::Data<GraphqlWebData>) -> bo
     if args.use_auth.is_some() && args.use_auth.unwrap() {
         if let Some(value) = req.headers().get("authorization") {
             if let Ok(user) = jwt::decode_token(value.to_str().unwrap_or(""), &args.jwt_secret) {
-                state
+               let user=  state
                     .db_conn
                     .clone()
                     .expect("error fetching db pool")
                     .get_user_by_email(&user)
-                    .await
-                    .is_ok()
+                    .await;
+                    user.is_ok() && user.unwrap().len() > 0
             } else {
                 false
             }
