@@ -50,7 +50,7 @@ async fn is_authorized(req: HttpRequest, state: web::Data<GraphqlWebData>) -> bo
                     .expect("error fetching db pool")
                     .get_user_by_email(&user)
                     .await;
-                user.is_ok() && user.unwrap().len() > 0
+                user.is_ok() && !user.unwrap().is_empty()
             } else {
                 false
             }
