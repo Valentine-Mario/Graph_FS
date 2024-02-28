@@ -9,12 +9,17 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+      
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-sqlite@v1
+        with:
+          sqlite-version: 3.40.0
+          sqlite-year: 2022
       - name: Run tests
-        run: cargo test -- --test-threads=1
+        run: cargo test
 
   fmt:
     name: Rustfmt
