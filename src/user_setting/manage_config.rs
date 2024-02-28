@@ -23,6 +23,7 @@ pub async fn add_user(args: Args, conn: &DBConn) -> Result<(), Error> {
         Ok(_) => Ok(()),
         Err(err) => {
             let error = format!("{:?}", err);
+            println!("{:?}", err);
             Err(Error::new(ErrorKind::InvalidData, error))
         }
     }

@@ -55,12 +55,12 @@ impl DBConn {
         permission: Option<String>,
     ) -> Result<(), Error> {
         if self.args.storage.is_none() {
-            let _row: (i64,) = sqlx::query_as(sqlite::CRAETE_NEW_USER_SQL)
+            let _row = sqlx::query(sqlite::CRAETE_NEW_USER_SQL)
                 .bind(name)
                 .bind(email)
                 .bind(password)
                 .bind(permission)
-                .fetch_one(self.sqlite.as_ref().unwrap())
+                .execute(self.sqlite.as_ref().unwrap())
                 .await?;
             Ok(())
         } else {
