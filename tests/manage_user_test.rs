@@ -1,93 +1,101 @@
-// use graph_fs::factory::args_factory;
-// use graph_fs::user_setting::manage_config::{
-//     add_user, delete_user, edit_user_acc_name, edit_user_acc_password, edit_user_acc_priviledge,
-//     get_user, GRAPH_FS_CONFIG,
-// };
-// use graph_fs::db::DBConn;
-// use std::path::Path;
+use graph_fs::db::DBConn;
+use graph_fs::factory::args_factory;
+use graph_fs::user_setting::manage_config::{
+    add_user, delete_user, edit_user_acc_name, edit_user_acc_password, edit_user_acc_priviledge,
+    get_user,
+};
+use std::path::Path;
 
 // // NOTE: PLEASE ALWAYS RUN TEST ON A SINGLE THREAD WITH THE COMMAND
 // // cargo test -- --test-threads=1
-// struct CleanUp;
+struct CleanUp;
 
-// impl Drop for CleanUp {
-//     fn drop(&mut self) {
-//         println!("Clean up after running all test");
-//         if Path::new(GRAPH_FS_CONFIG).exists() {
-//             match std::fs::remove_file(GRAPH_FS_CONFIG) {
-//                 Ok(_) => {}
-//                 Err(_) => {
-//                     println!("error deleting file")
-//                 }
-//             }
-//         }
-//     }
-// }
+impl Drop for CleanUp {
+    fn drop(&mut self) {
+        println!("Clean up after running all test");
+        if Path::new("./graph_fs.db").exists() {
+            match std::fs::remove_file("./graph_fs.db") {
+                Ok(_) => {}
+                Err(_) => {
+                    println!("error deleting file")
+                }
+            }
+        }
+    }
+}
 
-// fn add_user_util() -> Result<(), std::io::Error> {
-//     let arg = args_factory();
-//     add_user(&arg, DBConn::new())
-// }
+async fn add_user_util() -> Result<(), std::io::Error> {
+    let arg = args_factory();
+    add_user(arg, &DBConn::new().await.unwrap()).await.unwrap();
+    Ok(())
+}
 
-// #[test]
-// fn test_add_user() {
-//     let add = add_user_util();
-//     assert!(add.is_ok());
-//     let user = get_user("user_name", DBConn::new());
-//     assert!(user.is_ok());
-//     let _my_setup = CleanUp;
-// }
+#[actix_rt::test]
+async fn test_add_user() {
+    let add = add_user_util().await;
+    assert!(add.is_ok());
+    let user = get_user("email", &DBConn::new().await.unwrap()).await;
+    assert!(user.is_ok());
+    let _my_setup = CleanUp;
+}
 
-// #[test]
-// fn test_delete_user() {
-//     let add = add_user_util();
-//     let arg = args_factory();
+#[actix_rt::test]
+async fn test_delete_user() {
+    let add = add_user_util().await;
+    let arg = args_factory();
 
-//     assert!(add.is_ok());
-//     let deleted_user = delete_user(&arg.account_name);
-//     assert!(deleted_user.is_ok());
-//     let user = get_user("user_name");
-//     assert!(user.is_err());
-//     let _my_setup = CleanUp;
-// }
+    assert!(add.is_ok());
+    let dbase = &DBConn::new().await.unwrap();
+    let deleted_user = delete_user(&arg.account_email, &dbase).await;
+    assert!(deleted_user.is_ok());
+    let user = get_user("email", &dbase).await;
+    assert!(user.is_ok());
+    assert!(user.unwrap().len() == 0);
+    let _my_setup = CleanUp;
+}
 
-// #[test]
-// fn test_edit_user() {
-//     let add = add_user_util();
-//     let arg = args_factory();
+#[actix_rt::test]
+async fn test_edit_user() {
+    let add = add_user_util().await;
+    let arg = args_factory();
 
-//     assert!(add.is_ok());
-//     let edited_user = edit_user_acc_name(&arg);
-//     assert!(edited_user.is_ok());
-//     let user = get_user("user_name");
-//     assert!(user.is_err());
-//     let user = get_user("user_name_new");
-//     assert!(user.is_ok());
-//     let _my_setup = CleanUp;
-// }
+    assert!(add.is_ok());
+    let dbase = &DBConn::new().await.unwrap();
 
-// #[test]
-// fn test_edit_password() {
-//     let add = add_user_util();
-//     let arg = args_factory();
+    let edited_user = edit_user_acc_name(arg, &dbase).await;
+    assert!(edited_user.is_ok());
+    let user = get_user("email", &dbase).await;
+    assert!(user.is_ok());
+    assert!(user.as_ref().unwrap().len() > 0);
+    assert!(user.unwrap()[0].name == "user_name_new");
+    let _my_setup = CleanUp;
+}
 
-//     assert!(add.is_ok());
-//     let edited_user = edit_user_acc_password(&arg);
-//     assert!(edited_user.is_ok());
-//     let user = get_user("user_name");
-//     assert!(user.is_ok());
-//     let _my_setup = CleanUp;
-// }
+#[actix_rt::test]
+async fn test_edit_password() {
+    let add = add_user_util().await;
+    let arg = args_factory();
 
-// #[test]
-// fn test_edit_priviledge() {
-//     let add = add_user_util();
-//     let arg = args_factory();
+    assert!(add.is_ok());
+    let dbase = &DBConn::new().await.unwrap();
+    let edited_user = edit_user_acc_password(arg, &dbase).await;
+    assert!(edited_user.is_ok());
+    let user = get_user("user_name", &dbase).await;
+    assert!(user.is_ok());
+    let _my_setup = CleanUp;
+}
 
-//     assert!(add.is_ok());
-//     let edited_user = edit_user_acc_priviledge(&arg);
-//     assert!(edited_user.is_ok());
-//     let user = get_user("user_name");
-//     assert!(user.is_ok());
-//     let _my_setup = CleanUp;
-// }
+#[actix_rt::test]
+async fn test_edit_priviledge() {
+    let add = add_user_util().await;
+    let arg = args_factory();
+
+    assert!(add.is_ok());
+    let dbase = &DBConn::new().await.unwrap();
+
+    let edited_user = edit_user_acc_priviledge(arg, &dbase).await;
+    assert!(edited_user.is_ok());
+    let user = get_user("user_name", &dbase).await;
+    assert!(user.is_ok());
+    let _my_setup = CleanUp;
+}
