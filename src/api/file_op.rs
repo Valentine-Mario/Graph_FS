@@ -17,7 +17,7 @@ pub async fn read_file(
 ) -> Result<impl Responder, Error> {
     let file_path = std::path::Path::new(&info.path);
     utils::check_auth_path(file_path)?;
-    let file = actix_files::NamedFile::open_async(file_path).await?;
+    let file = actix_files::NamedFile::open(file_path)?;
     Ok(file.into_response(&req))
 }
 

@@ -28,6 +28,7 @@ impl FromRequest for Authorized {
             if is_authorized(req, state).await {
                 Ok(Authorized)
             } else {
+                log::error!("unauthorised attempt in accessing app");
                 Err(ErrorUnauthorized("not authorized"))?
             }
         })

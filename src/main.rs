@@ -60,6 +60,3 @@ async fn main() -> std::io::Result<()> {
         Ok(())
     }
 }
-//./target/debug/graph_fs -p 8000 -h 127.0.0.1 --auth_path /home/dead/Documents
-//remote
-//./target/debug/graph_fs -p 8000 -h 127.0.0.1 --remote true --auth_option user_password --remote_host 127.0.0.1 --remote_port 22 --username <name> --password <pass>
