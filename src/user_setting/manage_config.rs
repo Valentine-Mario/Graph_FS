@@ -44,11 +44,11 @@ pub async fn delete_user(email: &Option<String>, conn: &DBConn) -> Result<(), Er
 }
 
 pub async fn edit_user_acc_name(args: Args, conn: &DBConn) -> Result<(), Error> {
-    if args.account_email.is_none() || args.new_account_name.is_none() {
+    if args.account_email.is_none() || args.account_name.is_none() {
         panic!("Please provide a valid acc username and password")
     }
     let acc_email = args.account_email.unwrap();
-    let new_name = args.new_account_name.unwrap();
+    let new_name = args.account_name.unwrap();
 
     match conn.update_user_name(&new_name, &acc_email).await {
         Ok(_) => Ok(()),
