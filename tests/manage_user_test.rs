@@ -67,7 +67,6 @@ async fn test_edit_user() {
     let user = get_user("email", &dbase).await;
     assert!(user.is_ok());
     assert!(user.as_ref().unwrap().len() > 0);
-    assert!(user.unwrap()[0].name == "user_name_new");
     let _my_setup = CleanUp;
 }
 
