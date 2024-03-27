@@ -7,6 +7,7 @@ pub mod http_config;
 pub mod schema;
 pub mod user_setting;
 pub mod utils;
+use resolve_path::PathResolveExt;
 use ssh2::Session;
 
 // Main folder
@@ -34,6 +35,18 @@ async fn main() -> std::io::Result<()> {
         if a.authorized_path.is_none() {
             panic!("You must specify an auth path for the server")
         }
+
+        //resolve path
+        let auth_path = a.authorized_path.unwrap();
+        let resolved = auth_path.resolve();
+        if !resolved.exists() {
+            panic!(
+                "the auth path {:?} does not exist",
+                resolved.to_str().unwrap()
+            )
+        }
+
+        log::info!("authorized path set at {:?}", resolved.to_str());
 
         if args.key_path.is_some() && args.cert_path.is_some() {
             // Handle remote FS http server

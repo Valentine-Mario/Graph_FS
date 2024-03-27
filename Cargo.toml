@@ -40,6 +40,7 @@ jsonwebtoken="7"
 bcrypt = "0.8"
 sqlx = { version = "0.7.3", features = ["runtime-tokio-native-tls", "macros", "postgres", "sqlite" ] }
 actix-rt = "2.9.0"
+resolve-path = "0.1.0"
 
 
 [dependencies.uuid]
