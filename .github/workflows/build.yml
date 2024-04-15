@@ -18,9 +18,20 @@
               archive: tar.gz tar.xz tar.zst
             - target: x86_64-apple-darwin
               archive: zip
+     
       steps:
         - uses: actions/checkout@master
-        - name: Compile and release
+        
+        - name: Install OpenSSSL Darwin
+          run: |
+            brew update
+            brew install openssl
+            echo 'export PATH="/usr/local/opt/openssl/bin:$PATH"' >> ~/.bash_profile
+            source ~/.bash_profile
+          if: ${{ matrix.target }} == 'x86_64-apple-darwin'
+          
+          
+        - name: Compile and release        
           uses: rust-build/rust-build.action@v1.4.5
           env:
             GITHUB_TOKEN: ${{ secrets.BUILD_TOKEN }}
