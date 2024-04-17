@@ -109,6 +109,10 @@ pub struct Args {
     //db connection string
     #[structopt(long = "db_path")]
     pub db_path: Option<String>,
+
+    //cors origin
+    #[structopt(long = "allow_origin")]
+    pub cors_origin: Option<String>,
 }
 
 impl Args {

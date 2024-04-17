@@ -36,5 +36,6 @@ pub fn args_factory() -> Args {
         jwt_duration: Some(10),
         storage: None,
         db_path: None,
+        cors_origin: Some("*".to_string()),
     }
 }

@@ -41,6 +41,18 @@ fn remote_fs_routes(cfg: &mut web::ServiceConfig) {
     );
 }
 
+fn setup_cors(args: &Args) -> Cors {
+    let cors: Cors = if args.cors_origin.is_some() {
+        Cors::default()
+            .allowed_origin(&args.clone().cors_origin.unwrap())
+            .allowed_methods(vec!["GET", "POST"])
+            .allow_any_header()
+    } else {
+        Cors::permissive()
+    };
+    cors
+}
+
 pub async fn local_server(args: Args) -> std::io::Result<()> {
     let arg = args.clone();
     let dbase: Option<db::DBConn> = if args.use_auth.is_some() && args.use_auth.unwrap() {
@@ -61,7 +73,7 @@ pub async fn local_server(args: Args) -> std::io::Result<()> {
             .app_data(Data::from(local_data))
             .configure(local_fs_routes)
             // The GraphiQL UI requires CORS to be enabled
-            .wrap(Cors::permissive())
+            .wrap(setup_cors(&args))
             .wrap(middleware::Logger::default())
     })
     .workers(arg.worker.unwrap_or(2))
@@ -90,11 +102,12 @@ pub async fn remote_server(args: Args) -> std::io::Result<()> {
             args: args.clone(),
             db_conn: dbase.clone(),
         });
+
         App::new()
             .app_data(Data::from(remote_data))
             .configure(remote_fs_routes)
             // The GraphiQL UI requires CORS to be enabled
-            .wrap(Cors::permissive())
+            .wrap(setup_cors(&args))
             .wrap(middleware::Logger::default())
     })
     .workers(arg.worker.unwrap_or(2))
@@ -126,7 +139,7 @@ pub async fn local_server_ssl(args: Args) -> std::io::Result<()> {
             .app_data(Data::from(local_data))
             .configure(local_fs_routes)
             // The GraphiQL UI requires CORS to be enabled
-            .wrap(Cors::permissive())
+            .wrap(setup_cors(&args))
             .wrap(middleware::Logger::default())
     })
     .workers(arg.worker.unwrap_or(2))
@@ -162,7 +175,7 @@ pub async fn remote_server_ssl(args: Args) -> std::io::Result<()> {
             .app_data(Data::from(remote_data))
             .configure(remote_fs_routes)
             // The GraphiQL UI requires CORS to be enabled
-            .wrap(Cors::permissive())
+            .wrap(setup_cors(&args))
             .wrap(middleware::Logger::default())
     })
     .workers(arg.worker.unwrap_or(2))
