@@ -28,4 +28,4 @@
 | jwt_duration   | `JWT` secret, duration, to be supplied in days | 30 days |
 | storage   | `DB` storage for manging users for now it only accepts `psql` leave empty to use default option | sqlite |
 | db_path   | `DB` connection string | None |
-| allow_origin   | `CORS` origin to allow | None |
+| allow_origin   | `CORS` origin to allow | * |
