@@ -31,7 +31,6 @@ pub fn args_factory() -> Args {
         account_email: Some("email".to_string()),
         account_password: Some("pass".to_string()),
         account_permission: Some("read".to_string()),
-        new_account_name: Some("user_name_new".to_string()),
         jwt_secret: Some("secret".to_string()),
         jwt_duration: Some(10),
         storage: None,

@@ -11,4 +11,4 @@ cargo install graph_fs
 
 ```
 
-Usage [here](https://branch-orchid-999.notion.site/Graph-FS-usage-7b026cafc6de40ae885492e087273509)
+Read the documentation [here](https://github.com/Valentine-Mario/Graph_FS/blob/master/DOC.md)
