@@ -16,14 +16,17 @@ use futures::{StreamExt, TryStreamExt};
 pub async fn save_local_file(
     mut payload: Multipart,
     file_path: &Path,
-) -> Result<Option<bool>, Error> {
+) -> Result<Option<(bool, String)>, Error> {
+    let mut upload_path: String = "".to_string();
+
     // Iterate over multipart stream
     while let Ok(Some(mut field)) = payload.try_next().await {
         let content_type = field.content_disposition();
-        let filename = content_type.get_filename().unwrap();
+        let filename = content_type.get_filename().unwrap_or("");
         let uid = Uuid::new_v4().to_string();
         let new_name = format!("{}-{}", uid, filename);
         let filepath = file_path.join(new_name);
+        upload_path = filepath.to_str().unwrap().to_string();
 
         // File::create is blocking operation, use threadpool
         let mut f = web::block(|| std::fs::File::create(filepath))
@@ -39,15 +42,16 @@ pub async fn save_local_file(
                 .unwrap()?;
         }
     }
+    println!("file {}", upload_path);
 
-    Ok(Some(true))
+    Ok(Some((true, upload_path)))
 }
 
 pub async fn save_remote_file(
     mut payload: Multipart,
     sessiopn: &Session,
     file_path: &Path,
-) -> Result<Option<bool>, Error> {
+) -> Result<Option<(bool, String)>, Error> {
     let mut return_write: Vec<Vec<u8>> = vec![];
     let mut file_name = String::new();
 
@@ -73,7 +77,7 @@ pub async fn save_remote_file(
     remote_file.wait_eof()?;
     remote_file.close()?;
     remote_file.wait_close()?;
-    Ok(Some(true))
+    Ok(Some((true, file_name)))
 }
 
 // Stream buffer to client

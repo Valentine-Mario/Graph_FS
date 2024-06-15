@@ -57,6 +57,11 @@ pub struct LoginUser {
     pub email: String,
     pub password: String,
 }
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ApiResponse {
+    msg: String,
+    data: String,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct JsonRes {
@@ -81,6 +86,15 @@ pub struct MutationRoot;
 
 #[derive(Debug)]
 pub struct Subscription;
+
+impl ApiResponse {
+    pub fn new(msg: &str, data: &str) -> Self {
+        ApiResponse {
+            msg: msg.to_string(),
+            data: data.to_string(),
+        }
+    }
+}
 
 impl Message {
     pub fn new(msg: String) -> Self {

@@ -1,6 +1,6 @@
 use super::util::*;
 use crate::auth::check_access::{check_write_access, Authorized};
-use crate::schema::GraphqlWebData;
+use crate::schema::{ApiResponse, GraphqlWebData};
 use crate::{schema, utils};
 use actix_multipart::Multipart;
 use actix_web::http::header::HeaderValue;
@@ -15,7 +15,8 @@ pub async fn read_file(
     info: web::Query<schema::PathQuery>,
     _: Authorized,
 ) -> Result<impl Responder, Error> {
-    let file_path = std::path::Path::new(&info.path);
+    let child_path = info.path.trim();
+    let file_path = std::path::Path::new(child_path);
     utils::check_auth_path(file_path)?;
     let file = actix_files::NamedFile::open(file_path)?;
     Ok(file.into_response(&req))
@@ -44,15 +45,16 @@ pub async fn upload(
         }
     }
 
-    let file_path = std::path::Path::new(&info.path);
+    let child_path = info.path.trim();
+    let file_path = std::path::Path::new(child_path);
     utils::check_auth_path(file_path)?;
     let upload_status = save_local_file(payload, file_path).await;
     let val = match upload_status {
-        Ok(Some(val)) => {
+        Ok(Some((val, name))) => {
             if val {
                 Ok(HttpResponse::Ok()
                     .content_type("text/plain")
-                    .body("update_succeeded"))
+                    .json(ApiResponse::new("upload successful", &name)))
             } else {
                 Ok(HttpResponse::BadRequest()
                     .content_type("text/plain")
@@ -71,11 +73,12 @@ pub async fn read_remote_file(
     info: web::Query<schema::PathQuery>,
     _: Authorized,
 ) -> Result<HttpResponse, Error> {
+    let child_path = info.path.trim();
     let (mut remote_file, _) = sess
         .sess
         .as_ref()
         .unwrap()
-        .scp_recv(Path::new(&info.path))?;
+        .scp_recv(Path::new(child_path))?;
 
     let mut contents = Vec::new();
     remote_file.read_to_end(&mut contents)?;
@@ -106,15 +109,16 @@ pub async fn upload_remote_file(
         }
     }
 
-    let file_path = std::path::Path::new(&info.path);
+    let child_path = info.path.trim();
+    let file_path = std::path::Path::new(child_path);
     utils::check_auth_path(file_path)?;
     let upload_status = save_remote_file(payload, sess.sess.as_ref().unwrap(), file_path).await;
     let val = match upload_status {
-        Ok(Some(val)) => {
+        Ok(Some((val, name))) => {
             if val {
                 Ok(HttpResponse::Ok()
                     .content_type("text/plain")
-                    .body("update_succeeded"))
+                    .json(ApiResponse::new("upload successful", &name)))
             } else {
                 Ok(HttpResponse::BadRequest()
                     .content_type("text/plain")
