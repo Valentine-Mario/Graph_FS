@@ -24,7 +24,7 @@
 | acc_email   | email for new users (unique) and immutable | None |
 | acc_password   | password for new users or to update existing users password  | None |
 | acc_permission   | permission for new users or to update existing users permission  | None |
-| secret   | `JWT` secret, must be provided when in auth mode | None |
+| secret   | `JWT` secret, must be provided when in auth mode | "default" |
 | jwt_duration   | `JWT` secret, duration, to be supplied in days | 30 days |
 | storage   | `DB` storage for manging users for now it only accepts `psql` leave empty to use default option | sqlite |
 | db_path   | `DB` connection string | None |
