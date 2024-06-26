@@ -15,14 +15,21 @@ GraphFS integrates an advanced user management system which can be operated via 
 
 For example, to create a new user within GraphFS, an administrator would execute a command in the following structure:
 
-`graph_fs --manage_users add_user --acc_name val --acc_email val@gmail.com --acc_password 123`
+```console
+graph_fs --manage_users add_user --acc_name val --acc_email val@gmail.com --acc_password 123
+```
 
 > This command by default creates a  `graph_fs.db` SQLite file which tracks the user's details. 
 > Alternatively, you can choose to use PostgreSQL with the following command.
 
-`graph_fs --manage_users add_user --acc_name val --acc_email val@gmail.com --acc_password 123 --storage psql --db_path postgres://path_to_db`
+```console
+graph_fs --manage_users add_user --acc_name val --acc_email val@gmail.com --acc_password 123 --storage psql --db_path postgres://path_to_db
+```
 
-> Please not that for all commands that require PostgreSQL, you’ll have to add the `--storage psql --db_path postgres://path_to_db` flag
+> Please not that for all commands that require PostgreSQL, you’ll have to add the flag
+```console
+--storage psql --db_path postgres://path_to_db
+```
 
 This command specifies 'val' as the username, aligns it with the email address 'val@gmail.com', sets the password to '123', and assigns the user a role that permits both reading from and writing to the file system
 
@@ -33,16 +40,24 @@ You can add as many users as you wish but with unique email values. You can also
 #### Edit And Delete Users
 
 - To edit the user `val` to `valentine` execute the command  
-`graph_fs --manage_users update_username --acc_name valentine --acc_email val@gmail.com`
+```console
+graph_fs --manage_users update_username --acc_name valentine --acc_email val@gmail.com
+```
 
 - To update the user's password  
-`graph_fs --manage_users update_user_password --acc_email val@gmail.com --acc_password new_password123`
+```console
+graph_fs --manage_users update_user_password --acc_email val@gmail.com --acc_password new_password123
+```
 
 - To update a user's priviledge  
-`graph_fs --manage_users update_user_permission --acc_email val@gmail.com --acc_permission read`
+```console
+graph_fs --manage_users update_user_permission --acc_email val@gmail.com --acc_permission read
+```
 
 - To delete a user  
-`graph_fs --manage_users delete_user --acc_email val@gmail.com`
+```console
+graph_fs --manage_users delete_user --acc_email val@gmail.com
+```
 
 
 #### Server Configuration
@@ -51,13 +66,17 @@ GraphFS offers the flexibility to launch the GraphQL server with a suite of cust
 
 Additionally, when configuring the server to utilize PostgreSQL for user management storage, it is crucial to include the appropriate flags to connect to your PostgreSQL database. The flags --storage and --db_path are employed for this purpose:
 
-`--storage psql --db_path postgres://path_to_db`
+```console
+--storage psql --db_path postgres://path_to_db
+```
 
 The --storage psql flag explicitly signals that PostgreSQL is the storage mechanism for user data, while --db_path is accompanied by your database connection string (e.g., postgres://username:password@hostname:port/database_name). Be sure to replace postgres://path_to_db with your actual PostgreSQL database connection string.
 If you wish to use the default `Sqlite` you can omit the flag
 
 - To start the server with no auth enabled using the local file system, run the command  
-`graph_fs -p 8000 -h 127.0.0.1 --auth_path /home/acc/Pictures -w 3`
+```console
+graph_fs -p 8000 -h 127.0.0.1 --auth_path /home/acc/Pictures -w 3
+```
 
 **Breaking down the arguments:**
 
@@ -69,19 +88,27 @@ The --auth_path parameter implements an additional layer of access control by ex
 
 Furthermore, `--auth_path` parameter can also accept relative paths. For example:
 
-`graph_fs -p 8000 -h 127.0.0.1 --auth_path ~/Pictures -w 3`
+```console
+graph_fs -p 8000 -h 127.0.0.1 --auth_path ~/Pictures -w 3
+```
+
 In this case, `~/Pictures` would resolve to the equivalent absolute path `/home/acc/Pictures`, assuming 'acc' is the current user's home directory.
 
 Additionally, you can base the relative path on the current working directory from which you execute the graphfs_bin command. If your current directory is `/home/acc`, and you have a folder named 'Documents' within it, you could use:
 
-`graph_fs -p 8000 -h 127.0.0.1 --auth_path Documents -w 3` 
+```console
+graph_fs -p 8000 -h 127.0.0.1 --auth_path Documents -w 3
+```
 
 Here, `Documents` would resolve to `/home/acc/Documents`, which would become the root for file system queries by GraphFS.
 
 This flexibility allows for a simple and dynamic way to set up the permissible query directory based on either an absolute path, a home directory-relative path, or a relative path to the current directory, catering to the desired level of access control in a variety of deployment environments.
 
 - To start the server with auth enabled, using the local file system, run the command  
-`graph_fs -p 8000 -h 127.0.0.1 --auth_path /home/acc/Pictures --use_auth true --secret my_jwt_secret --jwt_duration 5`
+```console
+graph_fs -p 8000 -h 127.0.0.1 --auth_path /home/acc/Pictures --use_auth true --secret my_jwt_secret --jwt_duration 5
+```
+
 
 Here's a detailed explanation of the additional parameters:
 
@@ -95,7 +122,9 @@ Once authentication is enabled with the `--use_auth` flag, users will need to au
 - To start the server with a remote file system, you can use auth enabled or disabled just as above but you need to add the following additional parameters
 
 
-` -p 8000 -h 127.0.0.1 --remote true --auth_option user_password --remote_host 127.0.0.1 --remote_port 22 --username <name> --password <pass>` 
+```console
+-p 8000 -h 127.0.0.1 --remote true --auth_option user_password --remote_host 127.0.0.1 --remote_port 22 --username <name> --password <pass>
+```
 
 Let's dissect the provided command parameters:
 
@@ -112,20 +141,30 @@ For alternative SSH remote authentication methods, the provided examples display
 
 Using an SSH agent, which avoids storing credentials in the configuration:  
 
-`--auth_option user_agent --username <name>`
+```console
+--auth_option user_agent --username <name>
+```
+
 In this case, user_agent indicates that the server should utilize an SSH agent for authentication, and `--username` <name> should be replaced with the actual SSH username.
 
 Using public and private key authentication, which is a more secure method compared to passwords:  
 
-`--auth_option user_pub_key --username <name> --public_key <path_to_pub_key> --private_key <path_to_private_key> --passphrase <passphrase>`
+```console
+--auth_option user_pub_key --username <name> --public_key <path_to_pub_key> --private_key <path_to_private_key> --passphrase <passphrase>
+```
 
 
 Here, user_pub_key signals the usage of public key authentication. `--username` <name> is once again the SSH username. The `--public_key` and `--private_key` parameters accept paths to the user's public and private key files, respectively. If the private key is protected by a passphrase, it must be supplied using the `--passphrase` option.
 
 Remember to replace <name>, <path_to_pub_key>, <path_to_private_key>, and <passphrase> with the actual values relevant to your SSH configuration. Each authentication option is designed to match your security practices and preferences for remote file system access using GraphFS.
 
-- To start the server with SSL just add the following parameters  
-`--key_path <path to key file> --cert_path <path to certificate file>` 
+- To start the server with SSL just add the following parameters
+
+```console
+--key_path <path to key file> --cert_path <path to certificate file>
+```
+
+
 Graph FS would immediately detect this and start the server with SSL mode
 
 
